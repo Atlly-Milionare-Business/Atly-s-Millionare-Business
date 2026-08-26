@@ -194,16 +194,76 @@
             });
         }
 
-        document.getElementById('checkout-btn').addEventListener('click', function () {
+        // Supabase Edge Function that creates the Stripe Checkout Session.
+        // The anon key below is a public, client-safe key (not a secret) —
+        // it just identifies the project to Supabase's function gateway.
+        const CHECKOUT_ENDPOINT = 'https://jdwrivizhjtlbizyjmpl.supabase.co/functions/v1/create-checkout-session';
+        const SUPABASE_ANON_KEY = 'sb_publishable_J6ZVTn3A08l2H0jHUT4p2A_quON5Dv9';
+
+        document.getElementById('checkout-btn').addEventListener('click', async function () {
             const btn = this;
             const original = btn.textContent;
-            btn.textContent = 'Checkout coming soon';
-            btn.classList.add('clicked');
+            const items = window.AltusCart.getItems();
+
+            if (items.length === 0) return;
+
+            btn.disabled = true;
+            btn.textContent = 'Redirecting to checkout…';
+
+            try {
+                const res = await fetch(CHECKOUT_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+                    },
+                    body: JSON.stringify({
+                        items: items.map(i => ({ id: i.id, qty: i.qty, color: i.color, size: i.size })),
+                        successUrl: window.location.origin + window.location.pathname.replace(/cart\.html$/, '') + 'cart.html?checkout=success',
+                        cancelUrl: window.location.href
+                    })
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.url) {
+                    window.location.href = data.url;
+                    return;
+                }
+
+                if (data.error === 'not_configured') {
+                    btn.textContent = 'Checkout coming soon';
+                    btn.classList.add('clicked');
+                } else {
+                    btn.textContent = data.message || 'Something went wrong';
+                    btn.classList.add('clicked');
+                }
+            } catch (err) {
+                btn.textContent = 'Network error — try again';
+                btn.classList.add('clicked');
+            }
+
             setTimeout(() => {
                 btn.textContent = original;
                 btn.classList.remove('clicked');
-            }, 1800);
+                btn.disabled = false;
+            }, 2200);
         });
+
+        // Coming back from a successful Stripe payment: show a thank-you
+        // banner and clear the local cart. This trusts the redirect alone —
+        // there's no server-side order record yet (that needs a Stripe
+        // webhook writing to a Supabase table, not built yet).
+        if (new URLSearchParams(window.location.search).get('checkout') === 'success') {
+            window.AltusCart.getItems().forEach(() => {});
+            localStorage.removeItem('altus_cart_items');
+            window.AltusCart.renderBadge();
+            const banner = document.createElement('div');
+            banner.className = 'mb-8 border border-black/10 bg-brand-grey px-6 py-4 text-sm';
+            banner.textContent = 'Payment received — thank you for your order!';
+            document.querySelector('main').insertBefore(banner, document.querySelector('main').firstChild.nextSibling);
+        }
     </script>
 </body>
 </html>
