@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Altus Gear - Quality Sportswear</title>
+    <meta name="description" content="Altus Gear is a North Vancouver sportswear brand making compression shirts, long sleeves, warm-up jackets and sports jackets for the trail, the gym, and everywhere between.">
+    <link rel="icon" type="image/png" href="./assets/favicon.png">
+    <link rel="icon" href="./assets/favicon.ico">
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Configure Tailwind for custom colors and fonts -->
@@ -117,10 +120,9 @@
 
                 <!-- Model Image Column -->
                 <div class="flex items-center justify-end">
-                    <div class="w-full max-w-md slide-in" style="transition-delay: 0.6s;">
-                        <img src="https://placehold.co/400x600/000000/FFFFFF?text=UPLOAD+MODEL+IMAGE"
-                            onerror="this.onerror=null; this.src='https://placehold.co/400x600/000000/FFFFFF?text=UPLOAD+MODEL+IMAGE';"
-                            alt="Male models wearing Altus Gear sportswear" class="w-full h-auto object-cover rounded shadow-lg opacity-90">
+                    <div class="w-full max-w-md bg-brand-white/95 p-6 rounded shadow-lg slide-in" style="transition-delay: 0.6s;">
+                        <img src="./assets/shirt-front.jpg"
+                            alt="Altus Gear compression shirt" class="w-full h-auto object-contain">
                     </div>
                 </div>
             </div>
@@ -171,7 +173,7 @@
                 </h3>
                 <div class="flex items-center space-x-4">
                     <!-- Instagram Icon Placeholder (using inline SVG for simplicity) -->
-                    <a href="https://instagram.com/altus_gear" target="_blank" class="text-brand-white hover:text-brand-accent transition duration-300">
+                    <a href="https://instagram.com/altus_gear" target="_blank" rel="noopener noreferrer" class="text-brand-white hover:text-brand-accent transition duration-300">
                          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
                             <path d="M16 3h.01"></path>

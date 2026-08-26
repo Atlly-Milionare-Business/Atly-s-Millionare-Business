@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Altus Gear - Product</title>
+    <meta name="description" content="Altus Gear quality sportswear — select your colour, size, and quantity.">
+    <link rel="icon" type="image/png" href="./assets/favicon.png">
+    <link rel="icon" href="./assets/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-black': '#000000',
+                        'brand-white': '#ffffff',
+                        'brand-grey': '#f2f2f2',
+                        'brand-accent': '#8a8a8a',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Georgia', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .thumb.active { border-color: #000; }
+        .size-btn.active { background-color: #000; color: #fff; }
+        .color-dot.active { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #000; }
+        .accordion-chevron { transition: transform 0.25s ease; }
+        .accordion-panel {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .add-to-cart-btn.added { background-color: #16a34a !important; border-color: #16a34a !important; }
+        #main-image { transition: opacity 0.2s ease; }
+    </style>
+</head>
+<body class="font-sans bg-brand-white text-brand-black">
+
+    <!-- Top Nav -->
+    <nav class="border-b border-black/10">
+        <div class="max-w-7xl mx-auto flex justify-between items-center px-4 sm:px-6 py-4">
+            <a href="index.html" class="flex items-center space-x-3">
+                <img src="./assets/logo-mark.png" alt="Altus Gear Logo" class="w-8 h-8 object-contain invert">
+                <span class="text-lg font-serif tracking-widest uppercase hidden md:block">ALTUS GEAR</span>
+            </a>
+            <div class="space-x-8 text-sm tracking-wider font-light">
+                <a href="index.html" class="hover:text-brand-accent transition duration-300">Home</a>
+                <a href="products.html" class="hover:text-brand-accent transition duration-300">Products</a>
+                <a href="index.html#bio" class="hover:text-brand-accent transition duration-300">Bio</a>
+                <a href="index.html#contact" class="hover:text-brand-accent transition duration-300">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-8 pb-4">
+        <p class="text-sm text-brand-accent tracking-wide">
+            <a href="index.html" class="hover:text-brand-black transition">Shop</a>
+            <span class="mx-2">&gt;</span>
+            <a href="products.html" class="hover:text-brand-black transition">Products</a>
+            <span class="mx-2">&gt;</span>
+            <span id="crumb-name" class="text-brand-black">&nbsp;</span>
+        </p>
+    </div>
+
+    <!-- Product Detail -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 pb-24">
+        <div class="grid md:grid-cols-2 gap-10 lg:gap-16">
+
+            <!-- Gallery Column -->
+            <div class="flex gap-4">
+                <!-- Thumbnail rail -->
+                <div id="thumb-rail" class="flex flex-col gap-3 w-20 flex-shrink-0"></div>
+
+                <!-- Main image with arrows -->
+                <div class="relative bg-brand-grey flex-1 aspect-square overflow-hidden">
+                    <img id="main-image" src="" alt="" class="absolute inset-0 w-full h-full object-contain">
+                    <button id="prev-arrow" aria-label="Previous image" class="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white shadow flex items-center justify-center hover:bg-brand-grey transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    </button>
+                    <button id="next-arrow" aria-label="Next image" class="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white shadow flex items-center justify-center hover:bg-brand-grey transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Info Column -->
+            <div>
+                <h1 id="product-name" class="text-3xl sm:text-4xl font-serif uppercase tracking-wide mb-2">&nbsp;</h1>
+                <p id="product-price" class="text-xl font-medium mb-8">&nbsp;</p>
+
+                <!-- Colors -->
+                <div class="mb-8">
+                    <p class="text-sm font-medium tracking-wide mb-3">Select Colour — <span id="color-label" class="text-brand-accent font-normal"></span></p>
+                    <div id="color-row" class="flex gap-3"></div>
+                </div>
+
+                <!-- Sizes -->
+                <div class="mb-8">
+                    <p class="text-sm font-medium tracking-wide mb-3">Select Size</p>
+                    <div id="size-row" class="flex flex-wrap gap-2"></div>
+                </div>
+
+                <!-- Quantity -->
+                <div class="mb-8">
+                    <p class="text-sm font-medium tracking-wide mb-3">Quantity</p>
+                    <div class="inline-flex items-center border border-black/20">
+                        <button id="qty-minus" class="w-10 h-10 flex items-center justify-center hover:bg-brand-grey transition">&minus;</button>
+                        <span id="qty-value" class="w-10 text-center text-sm">01</span>
+                        <button id="qty-plus" class="w-10 h-10 flex items-center justify-center hover:bg-brand-grey transition">+</button>
+                    </div>
+                </div>
+
+                <!-- CTA buttons -->
+                <div class="flex gap-4 mb-8">
+                    <button id="add-to-cart" class="add-to-cart-btn flex-1 border-2 border-black text-black py-3 text-sm tracking-widest uppercase font-medium hover:bg-black hover:text-white transition">
+                        Add to cart
+                    </button>
+                    <button id="buy-now" class="flex-1 bg-black text-white py-3 text-sm tracking-widest uppercase font-medium hover:bg-brand-accent transition">
+                        Buy it now
+                    </button>
+                </div>
+
+                <p id="product-blurb" class="text-sm text-brand-accent leading-relaxed mb-8 border-t border-black/10 pt-6">&nbsp;</p>
+
+                <!-- Accordion -->
+                <div class="border-t border-black/10">
+                    <div class="accordion-item border-b border-black/10">
+                        <button class="accordion-toggle w-full flex justify-between items-center py-4 text-left">
+                            <span class="font-serif uppercase tracking-wide">Details</span>
+                            <svg class="accordion-chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div class="accordion-panel">
+                            <p class="text-sm text-brand-accent leading-relaxed pb-4">Constructed from a technical, moisture-wicking blend built for movement. True to size, tagless label, flatlock seams to reduce chafing on long efforts.</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item border-b border-black/10">
+                        <button class="accordion-toggle w-full flex justify-between items-center py-4 text-left">
+                            <span class="font-serif uppercase tracking-wide">Shipping &amp; Returns</span>
+                            <svg class="accordion-chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div class="accordion-panel">
+                            <p class="text-sm text-brand-accent leading-relaxed pb-4">Free shipping on orders over $75 within North Vancouver. Returns accepted within 30 days in original condition with tags attached.</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item border-b border-black/10">
+                        <button class="accordion-toggle w-full flex justify-between items-center py-4 text-left">
+                            <span class="font-serif uppercase tracking-wide">Description</span>
+                            <svg class="accordion-chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div class="accordion-panel">
+                            <p id="product-description" class="text-sm text-brand-accent leading-relaxed pb-4"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Product database — mirrors the cards on products.html
+        const PRODUCTS = {
+            1: {
+                name: 'Compression Shirt — Charcoal',
+                price: 65,
+                blurb: 'Second-skin fit built to move with you, from warm-up to the last set.',
+                images: ['./assets/shirt-front.jpg', './assets/shirt-back.jpg'],
+                colors: [
+                    { name: 'Charcoal', hex: '#36454F' },
+                    { name: 'Storm Blue', hex: '#46688C' },
+                    { name: 'Black', hex: '#111111' },
+                    { name: 'Alpine White', hex: '#EDEDED' }
+                ]
+            },
+            2: {
+                name: 'Compression Shirt — Storm Blue',
+                price: 65,
+                blurb: 'Second-skin fit built to move with you, from warm-up to the last set.',
+                images: [
+                    'https://placehold.co/600x600/f2f2f2/999999?text=Compression+Shirt%0AFront',
+                    'https://placehold.co/600x600/e6e6e6/999999?text=Compression+Shirt%0ABack'
+                ],
+                colors: [
+                    { name: 'Storm Blue', hex: '#46688C' },
+                    { name: 'Charcoal', hex: '#36454F' },
+                    { name: 'Black', hex: '#111111' },
+                    { name: 'Alpine White', hex: '#EDEDED' }
+                ]
+            },
+            3: {
+                name: 'Long Sleeve Tee — Black',
+                price: 55,
+                blurb: 'Lightweight layer for cool mornings on the trail or in the gym.',
+                images: [
+                    'https://placehold.co/600x600/f2f2f2/999999?text=Long+Sleeve+Tee%0AFront',
+                    'https://placehold.co/600x600/e6e6e6/999999?text=Long+Sleeve+Tee%0ABack'
+                ],
+                colors: [
+                    { name: 'Black', hex: '#111111' },
+                    { name: 'Charcoal', hex: '#36454F' },
+                    { name: 'Alpine White', hex: '#EDEDED' }
+                ]
+            },
+            4: {
+                name: 'Long Sleeve Tee — Alpine White',
+                price: 55,
+                blurb: 'Lightweight layer for cool mornings on the trail or in the gym.',
+                images: [
+                    'https://placehold.co/600x600/f2f2f2/999999?text=Long+Sleeve+Tee%0AFront',
+                    'https://placehold.co/600x600/e6e6e6/999999?text=Long+Sleeve+Tee%0ABack'
+                ],
+                colors: [
+                    { name: 'Alpine White', hex: '#EDEDED' },
+                    { name: 'Black', hex: '#111111' },
+                    { name: 'Charcoal', hex: '#36454F' }
+                ]
+            },
+            5: {
+                name: 'Warm-Up Jacket — Onyx',
+                price: 120,
+                blurb: 'Packable warmth for the walk to the trailhead and back.',
+                images: [
+                    'https://placehold.co/600x600/f2f2f2/999999?text=Warm-Up+Jacket%0AFront',
+                    'https://placehold.co/600x600/e6e6e6/999999?text=Warm-Up+Jacket%0ABack'
+                ],
+                colors: [
+                    { name: 'Onyx', hex: '#0d0d0d' },
+                    { name: 'Slate Grey', hex: '#6b6f76' },
+                    { name: 'Storm Blue', hex: '#46688C' },
+                    { name: 'Ridge Green', hex: '#4b5d43' },
+                    { name: 'Alpine White', hex: '#EDEDED' }
+                ]
+            },
+            6: {
+                name: 'Warm-Up Jacket — Slate Grey',
+                price: 120,
+                blurb: 'Packable warmth for the walk to the trailhead and back.',
+                images: [
+                    'https://placehold.co/600x600/f2f2f2/999999?text=Warm-Up+Jacket%0AFront',
+                    'https://placehold.co/600x600/e6e6e6/999999?text=Warm-Up+Jacket%0ABack'
+                ],
+                colors: [
+                    { name: 'Slate Grey', hex: '#6b6f76' },
+                    { name: 'Onyx', hex: '#0d0d0d' },
+                    { name: 'Storm Blue', hex: '#46688C' },
+                    { name: 'Ridge Green', hex: '#4b5d43' },
+                    { name: 'Alpine White', hex: '#EDEDED' }
+                ]
+            },
+            7: {
+                name: 'Sports Jacket — Summit Black',
+                price: 145,
+                blurb: 'Weather-ready shell for whatever the mountain throws at you.',
+                images: [
+                    'https://placehold.co/600x600/f2f2f2/999999?text=Sports+Jacket%0AFront',
+                    'https://placehold.co/600x600/e6e6e6/999999?text=Sports+Jacket%0ABack'
+                ],
+                colors: [
+                    { name: 'Summit Black', hex: '#111111' },
+                    { name: 'Ridge Green', hex: '#4b5d43' },
+                    { name: 'Slate Grey', hex: '#6b6f76' }
+                ]
+            },
+            8: {
+                name: 'Sports Jacket — Ridge Green',
+                price: 145,
+                blurb: 'Weather-ready shell for whatever the mountain throws at you.',
+                images: [
+                    'https://placehold.co/600x600/f2f2f2/999999?text=Sports+Jacket%0AFront',
+                    'https://placehold.co/600x600/e6e6e6/999999?text=Sports+Jacket%0ABack'
+                ],
+                colors: [
+                    { name: 'Ridge Green', hex: '#4b5d43' },
+                    { name: 'Summit Black', hex: '#111111' },
+                    { name: 'Slate Grey', hex: '#6b6f76' }
+                ]
+            }
+        };
+
+        const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
+
+        let state = { imgIndex: 0, colorIndex: 0, sizeIndex: 1, qty: 1 };
+
+        function getIdFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            const id = parseInt(params.get('id'), 10);
+            return PRODUCTS[id] ? id : 1;
+        }
+
+        function render() {
+            const id = getIdFromUrl();
+            const product = PRODUCTS[id];
+
+            document.title = 'Altus Gear - ' + product.name;
+            document.getElementById('crumb-name').textContent = product.name;
+            document.getElementById('product-name').textContent = product.name;
+            document.getElementById('product-price').textContent = '$' + product.price.toFixed(2);
+            document.getElementById('product-blurb').textContent = product.blurb;
+            document.getElementById('product-description').textContent =
+                product.blurb + ' Designed and tested in North Vancouver, built for trail, gym, and everywhere between.';
+
+            // Thumbnails
+            const rail = document.getElementById('thumb-rail');
+            rail.innerHTML = '';
+            product.images.forEach((src, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'thumb w-20 h-20 bg-brand-grey border-2 border-transparent overflow-hidden' + (i === state.imgIndex ? ' active' : '');
+                btn.innerHTML = `<img src="${src}" class="w-full h-full object-contain" alt="${product.name} view ${i + 1}">`;
+                btn.addEventListener('click', () => { state.imgIndex = i; render(); });
+                rail.appendChild(btn);
+            });
+
+            document.getElementById('main-image').src = product.images[state.imgIndex];
+            document.getElementById('main-image').alt = product.name;
+
+            // Colors
+            const colorRow = document.getElementById('color-row');
+            colorRow.innerHTML = '';
+            document.getElementById('color-label').textContent = product.colors[state.colorIndex].name;
+            product.colors.forEach((c, i) => {
+                const dot = document.createElement('button');
+                dot.className = 'color-dot w-8 h-8 rounded-full border border-black/10' + (i === state.colorIndex ? ' active' : '');
+                dot.style.backgroundColor = c.hex;
+                dot.setAttribute('aria-label', c.name);
+                dot.addEventListener('click', () => { state.colorIndex = i; render(); });
+                colorRow.appendChild(dot);
+            });
+
+            // Sizes
+            const sizeRow = document.getElementById('size-row');
+            sizeRow.innerHTML = '';
+            SIZES.forEach((s, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'size-btn w-12 h-12 border border-black/20 text-sm' + (i === state.sizeIndex ? ' active' : '');
+                btn.textContent = s;
+                btn.addEventListener('click', () => { state.sizeIndex = i; render(); });
+                sizeRow.appendChild(btn);
+            });
+
+            document.getElementById('qty-value').textContent = String(state.qty).padStart(2, '0');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            render();
+
+            document.getElementById('prev-arrow').addEventListener('click', () => {
+                const product = PRODUCTS[getIdFromUrl()];
+                state.imgIndex = (state.imgIndex - 1 + product.images.length) % product.images.length;
+                render();
+            });
+            document.getElementById('next-arrow').addEventListener('click', () => {
+                const product = PRODUCTS[getIdFromUrl()];
+                state.imgIndex = (state.imgIndex + 1) % product.images.length;
+                render();
+            });
+
+            document.getElementById('qty-minus').addEventListener('click', () => {
+                state.qty = Math.max(1, state.qty - 1);
+                render();
+            });
+            document.getElementById('qty-plus').addEventListener('click', () => {
+                state.qty = state.qty + 1;
+                render();
+            });
+
+            document.getElementById('add-to-cart').addEventListener('click', function () {
+                const btn = this;
+                const original = btn.textContent;
+                btn.textContent = 'Added ✓';
+                btn.classList.add('added');
+                setTimeout(() => {
+                    btn.textContent = original;
+                    btn.classList.remove('added');
+                }, 1400);
+            });
+
+            document.getElementById('buy-now').addEventListener('click', function () {
+                const btn = this;
+                const original = btn.textContent;
+                btn.textContent = 'Checkout coming soon';
+                setTimeout(() => { btn.textContent = original; }, 1600);
+            });
+
+            document.querySelectorAll('.accordion-toggle').forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    const panel = toggle.nextElementSibling;
+                    const chevron = toggle.querySelector('.accordion-chevron');
+                    const isOpen = panel.style.maxHeight && panel.style.maxHeight !== '0px';
+                    document.querySelectorAll('.accordion-panel').forEach(p => p.style.maxHeight = '0px');
+                    document.querySelectorAll('.accordion-chevron').forEach(c => c.style.transform = 'rotate(0deg)');
+                    if (!isOpen) {
+                        panel.style.maxHeight = panel.scrollHeight + 'px';
+                        chevron.style.transform = 'rotate(180deg)';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
