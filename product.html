@@ -64,7 +64,14 @@
                 <a href="products.html" data-nav="products.html" class="hover:text-brand-accent transition duration-300">Products</a>
                 <a href="index.html#bio" class="hover:text-brand-accent transition duration-300">Bio</a>
                 <a href="index.html#contact" class="hover:text-brand-accent transition duration-300">Contact</a>
-                <span class="text-xs tracking-widest uppercase text-brand-accent border-l border-black/20 pl-4 sm:pl-6">Cart (<span data-cart-count>0</span>)</span>
+                <a href="cart.html" aria-label="View cart" class="relative inline-flex items-center pl-4 sm:pl-6 border-l border-black/20 hover:text-brand-accent transition duration-300">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                        <path d="M3 6h18"></path>
+                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                    </svg>
+                    <span data-cart-badge class="hidden absolute -top-2 -right-2 min-w-[16px] h-4 px-1 rounded-full bg-black text-white text-[10px] font-medium leading-4 text-center">0</span>
+                </a>
             </div>
         </div>
     </nav>
@@ -398,7 +405,17 @@
             document.getElementById('add-to-cart').addEventListener('click', function () {
                 const btn = this;
                 const original = btn.textContent;
-                window.AltusCart.add(state.qty);
+                const id = getIdFromUrl();
+                const product = PRODUCTS[id];
+                window.AltusCart.addItem({
+                    id: id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.images[0],
+                    color: product.colors[state.colorIndex].name,
+                    size: SIZES[state.sizeIndex],
+                    qty: state.qty
+                });
                 btn.textContent = 'Added ✓';
                 btn.classList.add('added');
                 setTimeout(() => {

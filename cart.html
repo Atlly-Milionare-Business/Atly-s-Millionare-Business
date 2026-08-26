@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Altus Gear - Cart</title>
+    <meta name="description" content="Review your Altus Gear cart before checkout.">
+    <link rel="icon" type="image/png" href="./assets/favicon.png">
+    <link rel="icon" href="./assets/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-black': '#000000',
+                        'brand-white': '#ffffff',
+                        'brand-grey': '#f2f2f2',
+                        'brand-accent': '#8a8a8a',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Georgia', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .nav-current {
+            font-weight: 600;
+            text-decoration: underline;
+            text-underline-offset: 6px;
+        }
+        .qty-btn { width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center; }
+        .checkout-btn.clicked { background-color: #16a34a !important; }
+    </style>
+</head>
+<body class="font-sans bg-brand-white text-brand-black">
+
+    <!-- Top Nav -->
+    <nav class="sticky top-0 z-50 bg-brand-white border-b border-black/10">
+        <div class="max-w-7xl mx-auto flex justify-between items-center px-4 sm:px-6 py-4">
+            <a href="index.html" class="flex items-center space-x-3">
+                <img src="./assets/logo-mark.png" alt="Altus Gear Logo" class="w-8 h-8 object-contain invert">
+                <span class="text-lg font-serif tracking-widest uppercase hidden md:block">ALTUS GEAR</span>
+            </a>
+            <div class="flex items-center space-x-6 sm:space-x-8 text-sm tracking-wider font-light">
+                <a href="index.html" class="hover:text-brand-accent transition duration-300">Home</a>
+                <a href="products.html" data-nav="products.html" class="hover:text-brand-accent transition duration-300">Products</a>
+                <a href="index.html#bio" class="hover:text-brand-accent transition duration-300">Bio</a>
+                <a href="index.html#contact" class="hover:text-brand-accent transition duration-300">Contact</a>
+                <a href="cart.html" aria-label="View cart" class="relative inline-flex items-center pl-4 sm:pl-6 border-l border-black/20 text-black">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                        <path d="M3 6h18"></path>
+                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                    </svg>
+                    <span data-cart-badge class="hidden absolute -top-2 -right-2 min-w-[16px] h-4 px-1 rounded-full bg-black text-white text-[10px] font-medium leading-4 text-center">0</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 pt-8 pb-4">
+        <p class="text-sm text-brand-accent tracking-wide">
+            <a href="index.html" class="hover:text-brand-black transition">Shop</a>
+            <span class="mx-2">&gt;</span>
+            <span class="text-brand-black">Cart</span>
+        </p>
+    </div>
+
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 pb-24">
+        <h1 class="text-3xl sm:text-4xl font-serif uppercase tracking-wide mb-8">Your Cart</h1>
+
+        <!-- Empty state -->
+        <div id="empty-state" class="hidden py-16 text-center border-t border-black/10">
+            <p class="text-brand-accent mb-6">Your cart is empty.</p>
+            <a href="products.html" class="inline-block px-8 py-3 bg-brand-black text-brand-white text-sm tracking-widest font-medium uppercase hover:bg-brand-accent transition">
+                Continue Shopping
+            </a>
+        </div>
+
+        <!-- Cart contents -->
+        <div id="cart-contents" class="hidden">
+            <div id="cart-items" class="border-t border-black/10"></div>
+
+            <div class="flex justify-end mt-8">
+                <div class="w-full sm:w-80">
+                    <div class="flex justify-between text-sm text-brand-accent mb-2">
+                        <span>Subtotal</span>
+                        <span id="cart-subtotal">$0.00</span>
+                    </div>
+                    <p class="text-xs text-brand-accent mb-6">Shipping and taxes calculated at checkout.</p>
+                    <button id="checkout-btn" class="checkout-btn w-full bg-black text-white py-3 text-sm tracking-widest uppercase font-medium hover:bg-brand-accent transition">
+                        Proceed to Checkout
+                    </button>
+                    <a href="products.html" class="block text-center text-sm text-brand-accent hover:text-brand-black transition mt-4">
+                        Continue Shopping
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="./assets/cart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Mark current nav link (Products stays visually closest match; no dedicated Cart link style needed)
+            const path = window.location.pathname.split('/').pop() || 'index.html';
+            document.querySelectorAll('nav a[data-nav]').forEach(a => {
+                if (a.dataset.nav === path) a.classList.add('nav-current');
+            });
+
+            renderCart();
+        });
+
+        function money(n) {
+            return '$' + n.toFixed(2);
+        }
+
+        function renderCart() {
+            const items = window.AltusCart.getItems();
+            const emptyState = document.getElementById('empty-state');
+            const cartContents = document.getElementById('cart-contents');
+            const itemsContainer = document.getElementById('cart-items');
+
+            if (items.length === 0) {
+                emptyState.classList.remove('hidden');
+                cartContents.classList.add('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            cartContents.classList.remove('hidden');
+
+            itemsContainer.innerHTML = '';
+            items.forEach((item, index) => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center gap-4 sm:gap-6 py-6 border-b border-black/10';
+                row.innerHTML = `
+                    <div class="w-20 h-20 sm:w-24 sm:h-24 bg-brand-grey flex-shrink-0 overflow-hidden">
+                        <img src="${item.image}" alt="${item.name}" class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-medium truncate">${item.name}</p>
+                        <p class="text-xs text-brand-accent mt-1">${item.color} &middot; Size ${item.size}</p>
+                        <p class="text-sm mt-1">${money(item.price)}</p>
+                    </div>
+                    <div class="flex items-center border border-black/20 flex-shrink-0">
+                        <button class="qty-btn qty-minus hover:bg-brand-grey transition" data-index="${index}">&minus;</button>
+                        <span class="w-8 text-center text-sm">${item.qty}</span>
+                        <button class="qty-btn qty-plus hover:bg-brand-grey transition" data-index="${index}">+</button>
+                    </div>
+                    <p class="w-20 text-right font-medium flex-shrink-0">${money(item.price * item.qty)}</p>
+                    <button class="remove-item text-brand-accent hover:text-brand-black transition flex-shrink-0" data-index="${index}" aria-label="Remove item">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 6 6 18"></path>
+                            <path d="M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                `;
+                itemsContainer.appendChild(row);
+            });
+
+            document.getElementById('cart-subtotal').textContent = money(window.AltusCart.getSubtotal());
+
+            itemsContainer.querySelectorAll('.qty-minus').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const i = parseInt(btn.dataset.index, 10);
+                    const items = window.AltusCart.getItems();
+                    window.AltusCart.updateQty(i, items[i].qty - 1);
+                    renderCart();
+                });
+            });
+            itemsContainer.querySelectorAll('.qty-plus').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const i = parseInt(btn.dataset.index, 10);
+                    const items = window.AltusCart.getItems();
+                    window.AltusCart.updateQty(i, items[i].qty + 1);
+                    renderCart();
+                });
+            });
+            itemsContainer.querySelectorAll('.remove-item').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const i = parseInt(btn.dataset.index, 10);
+                    window.AltusCart.removeItem(i);
+                    renderCart();
+                });
+            });
+        }
+
+        document.getElementById('checkout-btn').addEventListener('click', function () {
+            const btn = this;
+            const original = btn.textContent;
+            btn.textContent = 'Checkout coming soon';
+            btn.classList.add('clicked');
+            setTimeout(() => {
+                btn.textContent = original;
+                btn.classList.remove('clicked');
+            }, 1800);
+        });
+    </script>
+</body>
+</html>
