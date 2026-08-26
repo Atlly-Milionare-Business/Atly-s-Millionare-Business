@@ -148,7 +148,7 @@
                     </div>
                     <div class="flex-1 min-w-0">
                         <p class="font-medium truncate">${item.name}</p>
-                        <p class="text-xs text-brand-accent mt-1">${item.color} &middot; Size ${item.size}</p>
+                        <p class="text-xs text-brand-accent mt-1">${[item.color, item.size].filter(Boolean).join(' &middot; Size ')}</p>
                         <p class="text-sm mt-1">${money(item.price)}</p>
                     </div>
                     <div class="flex items-center border border-black/20 flex-shrink-0">

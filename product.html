@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Altus Gear - Product</title>
-    <meta name="description" content="Altus Gear quality sportswear — select your colour, size, and quantity.">
+    <meta name="description" content="Altus Gear cangurera — select your colour and quantity.">
     <link rel="icon" type="image/png" href="./assets/favicon.png">
     <link rel="icon" href="./assets/favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,7 +31,6 @@
     </script>
     <style>
         .thumb.active { border-color: #000; }
-        .size-btn.active { background-color: #000; color: #fff; }
         .color-dot.active { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #000; }
         .accordion-chevron { transition: transform 0.25s ease; }
         .accordion-panel {
@@ -93,16 +92,16 @@
 
             <!-- Gallery Column -->
             <div class="flex gap-4">
-                <!-- Thumbnail rail -->
-                <div id="thumb-rail" class="flex flex-col gap-3 w-20 flex-shrink-0"></div>
+                <!-- Thumbnail rail (hidden when there's only one photo) -->
+                <div id="thumb-rail" class="hidden flex-col gap-3 w-20 flex-shrink-0"></div>
 
                 <!-- Main image with arrows -->
                 <div class="relative bg-brand-grey flex-1 aspect-square overflow-hidden">
                     <img id="main-image" src="" alt="" class="absolute inset-0 w-full h-full object-contain">
-                    <button id="prev-arrow" aria-label="Previous image" class="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white shadow flex items-center justify-center hover:bg-brand-grey transition">
+                    <button id="prev-arrow" aria-label="Previous image" class="hidden absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white shadow items-center justify-center hover:bg-brand-grey transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                     </button>
-                    <button id="next-arrow" aria-label="Next image" class="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white shadow flex items-center justify-center hover:bg-brand-grey transition">
+                    <button id="next-arrow" aria-label="Next image" class="hidden absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white shadow items-center justify-center hover:bg-brand-grey transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                     </button>
                 </div>
@@ -111,18 +110,13 @@
             <!-- Info Column -->
             <div>
                 <h1 id="product-name" class="text-3xl sm:text-4xl font-serif uppercase tracking-wide mb-2">&nbsp;</h1>
-                <p id="product-price" class="text-xl font-medium mb-8">&nbsp;</p>
+                <p id="product-price" class="text-xl font-medium mb-2">&nbsp;</p>
+                <p class="text-sm text-brand-accent mb-8">Colour: <span id="color-label"></span></p>
 
-                <!-- Colors -->
+                <!-- Other colours -->
                 <div class="mb-8">
-                    <p class="text-sm font-medium tracking-wide mb-3">Select Colour — <span id="color-label" class="text-brand-accent font-normal"></span></p>
+                    <p class="text-sm font-medium tracking-wide mb-3">Other colours</p>
                     <div id="color-row" class="flex gap-3"></div>
-                </div>
-
-                <!-- Sizes -->
-                <div class="mb-8">
-                    <p class="text-sm font-medium tracking-wide mb-3">Select Size</p>
-                    <div id="size-row" class="flex flex-wrap gap-2"></div>
                 </div>
 
                 <!-- Quantity -->
@@ -155,7 +149,7 @@
                             <svg class="accordion-chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </button>
                         <div class="accordion-panel">
-                            <p class="text-sm text-brand-accent leading-relaxed pb-4">Constructed from a technical, moisture-wicking blend built for movement. True to size, tagless label, flatlock seams to reduce chafing on long efforts.</p>
+                            <p class="text-sm text-brand-accent leading-relaxed pb-4">Compact crossbody cangurera with an adjustable strap and a diagonal zip pocket. Water-resistant shell, lightweight enough for everyday carry.</p>
                         </div>
                     </div>
                     <div class="accordion-item border-b border-black/10">
@@ -200,125 +194,29 @@
         // Product database — mirrors the cards on products.html
         const PRODUCTS = {
             1: {
-                name: 'Compression Shirt — Charcoal',
-                price: 65,
-                blurb: 'Second-skin fit built to move with you, from warm-up to the last set.',
-                images: ['./assets/shirt-front.jpg', './assets/shirt-back.jpg'],
-                colors: [
-                    { name: 'Charcoal', hex: '#36454F' },
-                    { name: 'Storm Blue', hex: '#46688C' },
-                    { name: 'Black', hex: '#111111' },
-                    { name: 'Alpine White', hex: '#EDEDED' }
-                ]
+                name: 'Cangurera — Black',
+                price: 20,
+                blurb: 'Compact crossbody cangurera, built for everyday carry.',
+                images: ['./assets/bag-black.jpg'],
+                colorName: 'Black'
             },
             2: {
-                name: 'Compression Shirt — Storm Blue',
-                price: 65,
-                blurb: 'Second-skin fit built to move with you, from warm-up to the last set.',
-                images: [
-                    'https://placehold.co/600x600/f2f2f2/999999?text=Compression+Shirt%0AFront',
-                    'https://placehold.co/600x600/e6e6e6/999999?text=Compression+Shirt%0ABack'
-                ],
-                colors: [
-                    { name: 'Storm Blue', hex: '#46688C' },
-                    { name: 'Charcoal', hex: '#36454F' },
-                    { name: 'Black', hex: '#111111' },
-                    { name: 'Alpine White', hex: '#EDEDED' }
-                ]
+                name: 'Cangurera — Grey',
+                price: 20,
+                blurb: 'Compact crossbody cangurera, built for everyday carry.',
+                images: ['./assets/bag-grey.jpg'],
+                colorName: 'Grey'
             },
             3: {
-                name: 'Long Sleeve Tee — Black',
-                price: 55,
-                blurb: 'Lightweight layer for cool mornings on the trail or in the gym.',
-                images: [
-                    'https://placehold.co/600x600/f2f2f2/999999?text=Long+Sleeve+Tee%0AFront',
-                    'https://placehold.co/600x600/e6e6e6/999999?text=Long+Sleeve+Tee%0ABack'
-                ],
-                colors: [
-                    { name: 'Black', hex: '#111111' },
-                    { name: 'Charcoal', hex: '#36454F' },
-                    { name: 'Alpine White', hex: '#EDEDED' }
-                ]
-            },
-            4: {
-                name: 'Long Sleeve Tee — Alpine White',
-                price: 55,
-                blurb: 'Lightweight layer for cool mornings on the trail or in the gym.',
-                images: [
-                    'https://placehold.co/600x600/f2f2f2/999999?text=Long+Sleeve+Tee%0AFront',
-                    'https://placehold.co/600x600/e6e6e6/999999?text=Long+Sleeve+Tee%0ABack'
-                ],
-                colors: [
-                    { name: 'Alpine White', hex: '#EDEDED' },
-                    { name: 'Black', hex: '#111111' },
-                    { name: 'Charcoal', hex: '#36454F' }
-                ]
-            },
-            5: {
-                name: 'Warm-Up Jacket — Onyx',
-                price: 120,
-                blurb: 'Packable warmth for the walk to the trailhead and back.',
-                images: [
-                    'https://placehold.co/600x600/f2f2f2/999999?text=Warm-Up+Jacket%0AFront',
-                    'https://placehold.co/600x600/e6e6e6/999999?text=Warm-Up+Jacket%0ABack'
-                ],
-                colors: [
-                    { name: 'Onyx', hex: '#0d0d0d' },
-                    { name: 'Slate Grey', hex: '#6b6f76' },
-                    { name: 'Storm Blue', hex: '#46688C' },
-                    { name: 'Ridge Green', hex: '#4b5d43' },
-                    { name: 'Alpine White', hex: '#EDEDED' }
-                ]
-            },
-            6: {
-                name: 'Warm-Up Jacket — Slate Grey',
-                price: 120,
-                blurb: 'Packable warmth for the walk to the trailhead and back.',
-                images: [
-                    'https://placehold.co/600x600/f2f2f2/999999?text=Warm-Up+Jacket%0AFront',
-                    'https://placehold.co/600x600/e6e6e6/999999?text=Warm-Up+Jacket%0ABack'
-                ],
-                colors: [
-                    { name: 'Slate Grey', hex: '#6b6f76' },
-                    { name: 'Onyx', hex: '#0d0d0d' },
-                    { name: 'Storm Blue', hex: '#46688C' },
-                    { name: 'Ridge Green', hex: '#4b5d43' },
-                    { name: 'Alpine White', hex: '#EDEDED' }
-                ]
-            },
-            7: {
-                name: 'Sports Jacket — Summit Black',
-                price: 145,
-                blurb: 'Weather-ready shell for whatever the mountain throws at you.',
-                images: [
-                    'https://placehold.co/600x600/f2f2f2/999999?text=Sports+Jacket%0AFront',
-                    'https://placehold.co/600x600/e6e6e6/999999?text=Sports+Jacket%0ABack'
-                ],
-                colors: [
-                    { name: 'Summit Black', hex: '#111111' },
-                    { name: 'Ridge Green', hex: '#4b5d43' },
-                    { name: 'Slate Grey', hex: '#6b6f76' }
-                ]
-            },
-            8: {
-                name: 'Sports Jacket — Ridge Green',
-                price: 145,
-                blurb: 'Weather-ready shell for whatever the mountain throws at you.',
-                images: [
-                    'https://placehold.co/600x600/f2f2f2/999999?text=Sports+Jacket%0AFront',
-                    'https://placehold.co/600x600/e6e6e6/999999?text=Sports+Jacket%0ABack'
-                ],
-                colors: [
-                    { name: 'Ridge Green', hex: '#4b5d43' },
-                    { name: 'Summit Black', hex: '#111111' },
-                    { name: 'Slate Grey', hex: '#6b6f76' }
-                ]
+                name: 'Cangurera — Navy',
+                price: 20,
+                blurb: 'Compact crossbody cangurera, built for everyday carry.',
+                images: ['./assets/bag-navy.jpg'],
+                colorName: 'Navy'
             }
         };
 
-        const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
-
-        let state = { imgIndex: 0, colorIndex: 0, sizeIndex: 1, qty: 1 };
+        let state = { imgIndex: 0, qty: 1 };
 
         function getIdFromUrl() {
             const params = new URLSearchParams(window.location.search);
@@ -334,12 +232,23 @@
             document.getElementById('crumb-name').textContent = product.name;
             document.getElementById('product-name').textContent = product.name;
             document.getElementById('product-price').textContent = '$' + product.price.toFixed(2);
+            document.getElementById('color-label').textContent = product.colorName;
             document.getElementById('product-blurb').textContent = product.blurb;
             document.getElementById('product-description').textContent =
-                product.blurb + ' Designed and tested in North Vancouver, built for trail, gym, and everywhere between.';
+                product.blurb + ' Designed and tested in North Vancouver.';
 
-            // Thumbnails
+            // Gallery: only show thumbnails/arrows if there's more than one photo
             const rail = document.getElementById('thumb-rail');
+            const prevArrow = document.getElementById('prev-arrow');
+            const nextArrow = document.getElementById('next-arrow');
+            const hasMultiple = product.images.length > 1;
+            rail.classList.toggle('hidden', !hasMultiple);
+            rail.classList.toggle('flex', hasMultiple);
+            prevArrow.classList.toggle('hidden', !hasMultiple);
+            prevArrow.classList.toggle('flex', hasMultiple);
+            nextArrow.classList.toggle('hidden', !hasMultiple);
+            nextArrow.classList.toggle('flex', hasMultiple);
+
             rail.innerHTML = '';
             product.images.forEach((src, i) => {
                 const btn = document.createElement('button');
@@ -352,28 +261,17 @@
             document.getElementById('main-image').src = product.images[state.imgIndex];
             document.getElementById('main-image').alt = product.name;
 
-            // Colors
+            // Other colours — links to the sibling product pages
             const colorRow = document.getElementById('color-row');
             colorRow.innerHTML = '';
-            document.getElementById('color-label').textContent = product.colors[state.colorIndex].name;
-            product.colors.forEach((c, i) => {
-                const dot = document.createElement('button');
-                dot.className = 'color-dot w-8 h-8 rounded-full border border-black/10' + (i === state.colorIndex ? ' active' : '');
-                dot.style.backgroundColor = c.hex;
-                dot.setAttribute('aria-label', c.name);
-                dot.addEventListener('click', () => { state.colorIndex = i; render(); });
-                colorRow.appendChild(dot);
-            });
-
-            // Sizes
-            const sizeRow = document.getElementById('size-row');
-            sizeRow.innerHTML = '';
-            SIZES.forEach((s, i) => {
-                const btn = document.createElement('button');
-                btn.className = 'size-btn w-12 h-12 border border-black/20 text-sm' + (i === state.sizeIndex ? ' active' : '');
-                btn.textContent = s;
-                btn.addEventListener('click', () => { state.sizeIndex = i; render(); });
-                sizeRow.appendChild(btn);
+            Object.keys(PRODUCTS).forEach((pid) => {
+                const p = PRODUCTS[pid];
+                const link = document.createElement('a');
+                link.href = `product.html?id=${pid}`;
+                link.className = 'block w-9 h-9 rounded-full border border-black/10 overflow-hidden' + (Number(pid) === id ? ' color-dot active' : '');
+                link.setAttribute('aria-label', p.colorName);
+                link.innerHTML = `<img src="${p.images[0]}" class="w-full h-full object-cover" alt="${p.colorName}">`;
+                colorRow.appendChild(link);
             });
 
             document.getElementById('qty-value').textContent = String(state.qty).padStart(2, '0');
@@ -412,8 +310,8 @@
                     name: product.name,
                     price: product.price,
                     image: product.images[0],
-                    color: product.colors[state.colorIndex].name,
-                    size: SIZES[state.sizeIndex],
+                    color: product.colorName,
+                    size: null,
                     qty: state.qty
                 });
                 btn.textContent = 'Added ✓';
@@ -423,25 +321,6 @@
                     btn.classList.remove('added');
                 }, 1400);
             });
-
-            // Image zoom lightbox
-            const zoomModal = document.getElementById('zoom-modal');
-            const zoomImage = document.getElementById('zoom-image');
-            const mainImage = document.getElementById('main-image');
-
-            function openZoom() {
-                zoomImage.src = mainImage.src;
-                zoomImage.alt = mainImage.alt;
-                zoomModal.classList.add('open');
-            }
-            function closeZoom() {
-                zoomModal.classList.remove('open');
-            }
-
-            mainImage.addEventListener('click', openZoom);
-            document.getElementById('zoom-close').addEventListener('click', closeZoom);
-            zoomModal.addEventListener('click', (e) => { if (e.target === zoomModal) closeZoom(); });
-            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeZoom(); });
 
             const CHECKOUT_ENDPOINT = 'https://jdwrivizhjtlbizyjmpl.supabase.co/functions/v1/create-checkout-session';
             const SUPABASE_ANON_KEY = 'sb_publishable_J6ZVTn3A08l2H0jHUT4p2A_quON5Dv9';
@@ -467,8 +346,7 @@
                             items: [{
                                 id: id,
                                 qty: state.qty,
-                                color: product.colors[state.colorIndex].name,
-                                size: SIZES[state.sizeIndex]
+                                color: product.colorName
                             }],
                             successUrl: window.location.origin + window.location.pathname.replace(/product\.html$/, '') + 'cart.html?checkout=success',
                             cancelUrl: window.location.href
@@ -492,6 +370,25 @@
                     btn.disabled = false;
                 }, 2200);
             });
+
+            // Image zoom lightbox
+            const zoomModal = document.getElementById('zoom-modal');
+            const zoomImage = document.getElementById('zoom-image');
+            const mainImage = document.getElementById('main-image');
+
+            function openZoom() {
+                zoomImage.src = mainImage.src;
+                zoomImage.alt = mainImage.alt;
+                zoomModal.classList.add('open');
+            }
+            function closeZoom() {
+                zoomModal.classList.remove('open');
+            }
+
+            mainImage.addEventListener('click', openZoom);
+            document.getElementById('zoom-close').addEventListener('click', closeZoom);
+            zoomModal.addEventListener('click', (e) => { if (e.target === zoomModal) closeZoom(); });
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeZoom(); });
 
             document.querySelectorAll('.accordion-toggle').forEach(toggle => {
                 toggle.addEventListener('click', () => {
