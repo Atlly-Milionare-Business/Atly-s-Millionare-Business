@@ -7,6 +7,9 @@
     <meta name="description" content="Shop Altus Gear compression shirts, long sleeves, warm-up jackets and sports jackets — quality sportswear designed in North Vancouver.">
     <link rel="icon" type="image/png" href="./assets/favicon.png">
     <link rel="icon" href="./assets/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -42,22 +45,41 @@
             background-color: #000;
             color: #fff;
         }
+        .nav-current {
+            font-weight: 600;
+            text-decoration: underline;
+            text-underline-offset: 6px;
+        }
+
+        /* Touch devices have no hover — auto-cycle front/back so the
+           second angle is still discoverable without a tap-to-navigate conflict */
+        @media (hover: none) {
+            .product-card .img-back {
+                animation: altus-cycle 5s ease-in-out infinite;
+            }
+            @keyframes altus-cycle {
+                0%, 45% { opacity: 0; }
+                55%, 90% { opacity: 1; }
+                100% { opacity: 0; }
+            }
+        }
     </style>
 </head>
 <body class="font-sans bg-brand-white text-brand-black">
 
     <!-- Top Nav -->
-    <nav class="border-b border-black/10">
+    <nav class="sticky top-0 z-50 bg-brand-white border-b border-black/10">
         <div class="max-w-7xl mx-auto flex justify-between items-center px-4 sm:px-6 py-4">
             <a href="index.html" class="flex items-center space-x-3">
                 <img src="./assets/logo-mark.png" alt="Altus Gear Logo" class="w-8 h-8 object-contain invert">
                 <span class="text-lg font-serif tracking-widest uppercase hidden md:block">ALTUS GEAR</span>
             </a>
-            <div class="space-x-8 text-sm tracking-wider font-light">
+            <div class="flex items-center space-x-6 sm:space-x-8 text-sm tracking-wider font-light">
                 <a href="index.html" class="hover:text-brand-accent transition duration-300">Home</a>
-                <a href="products.html" class="hover:text-brand-accent transition duration-300">Products</a>
+                <a href="products.html" data-nav="products.html" class="hover:text-brand-accent transition duration-300">Products</a>
                 <a href="index.html#bio" class="hover:text-brand-accent transition duration-300">Bio</a>
                 <a href="index.html#contact" class="hover:text-brand-accent transition duration-300">Contact</a>
+                <span class="text-xs tracking-widest uppercase text-brand-accent border-l border-black/20 pl-4 sm:pl-6">Cart (<span data-cart-count>0</span>)</span>
             </div>
         </div>
     </nav>
@@ -210,7 +232,16 @@
         </div>
     </main>
 
+    <script src="./assets/cart.js"></script>
     <script>
+        // Mark the current page's nav link
+        document.addEventListener('DOMContentLoaded', () => {
+            const path = window.location.pathname.split('/').pop() || 'index.html';
+            document.querySelectorAll('nav a[data-nav]').forEach(a => {
+                if (a.dataset.nav === path) a.classList.add('nav-current');
+            });
+        });
+
         // Filter bar logic
         document.addEventListener('DOMContentLoaded', () => {
             const pills = document.querySelectorAll('.filter-pill');

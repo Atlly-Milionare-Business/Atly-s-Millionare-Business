@@ -7,6 +7,9 @@
     <meta name="description" content="Altus Gear quality sportswear — select your colour, size, and quantity.">
     <link rel="icon" type="image/png" href="./assets/favicon.png">
     <link rel="icon" href="./assets/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -37,23 +40,31 @@
             transition: max-height 0.3s ease;
         }
         .add-to-cart-btn.added { background-color: #16a34a !important; border-color: #16a34a !important; }
-        #main-image { transition: opacity 0.2s ease; }
+        #main-image { transition: opacity 0.2s ease; cursor: zoom-in; }
+        .nav-current {
+            font-weight: 600;
+            text-decoration: underline;
+            text-underline-offset: 6px;
+        }
+        #zoom-modal { display: none; }
+        #zoom-modal.open { display: flex; }
     </style>
 </head>
 <body class="font-sans bg-brand-white text-brand-black">
 
     <!-- Top Nav -->
-    <nav class="border-b border-black/10">
+    <nav class="sticky top-0 z-50 bg-brand-white border-b border-black/10">
         <div class="max-w-7xl mx-auto flex justify-between items-center px-4 sm:px-6 py-4">
             <a href="index.html" class="flex items-center space-x-3">
                 <img src="./assets/logo-mark.png" alt="Altus Gear Logo" class="w-8 h-8 object-contain invert">
                 <span class="text-lg font-serif tracking-widest uppercase hidden md:block">ALTUS GEAR</span>
             </a>
-            <div class="space-x-8 text-sm tracking-wider font-light">
+            <div class="flex items-center space-x-6 sm:space-x-8 text-sm tracking-wider font-light">
                 <a href="index.html" class="hover:text-brand-accent transition duration-300">Home</a>
-                <a href="products.html" class="hover:text-brand-accent transition duration-300">Products</a>
+                <a href="products.html" data-nav="products.html" class="hover:text-brand-accent transition duration-300">Products</a>
                 <a href="index.html#bio" class="hover:text-brand-accent transition duration-300">Bio</a>
                 <a href="index.html#contact" class="hover:text-brand-accent transition duration-300">Contact</a>
+                <span class="text-xs tracking-widest uppercase text-brand-accent border-l border-black/20 pl-4 sm:pl-6">Cart (<span data-cart-count>0</span>)</span>
             </div>
         </div>
     </nav>
@@ -163,7 +174,22 @@
         </div>
     </main>
 
+    <!-- Image zoom lightbox -->
+    <div id="zoom-modal" class="fixed inset-0 z-50 items-center justify-center bg-black/90 p-6">
+        <button id="zoom-close" aria-label="Close zoomed image" class="absolute top-6 right-6 text-white text-3xl leading-none hover:text-brand-accent transition">&times;</button>
+        <img id="zoom-image" src="" alt="" class="max-w-full max-h-full object-contain cursor-zoom-out">
+    </div>
+
+    <script src="./assets/cart.js"></script>
     <script>
+        // Mark the current page's nav link
+        document.addEventListener('DOMContentLoaded', () => {
+            const path = window.location.pathname.split('/').pop() || 'index.html';
+            document.querySelectorAll('nav a[data-nav]').forEach(a => {
+                if (a.dataset.nav === path) a.classList.add('nav-current');
+            });
+        });
+
         // Product database — mirrors the cards on products.html
         const PRODUCTS = {
             1: {
@@ -372,6 +398,7 @@
             document.getElementById('add-to-cart').addEventListener('click', function () {
                 const btn = this;
                 const original = btn.textContent;
+                window.AltusCart.add(state.qty);
                 btn.textContent = 'Added ✓';
                 btn.classList.add('added');
                 setTimeout(() => {
@@ -379,6 +406,25 @@
                     btn.classList.remove('added');
                 }, 1400);
             });
+
+            // Image zoom lightbox
+            const zoomModal = document.getElementById('zoom-modal');
+            const zoomImage = document.getElementById('zoom-image');
+            const mainImage = document.getElementById('main-image');
+
+            function openZoom() {
+                zoomImage.src = mainImage.src;
+                zoomImage.alt = mainImage.alt;
+                zoomModal.classList.add('open');
+            }
+            function closeZoom() {
+                zoomModal.classList.remove('open');
+            }
+
+            mainImage.addEventListener('click', openZoom);
+            document.getElementById('zoom-close').addEventListener('click', closeZoom);
+            zoomModal.addEventListener('click', (e) => { if (e.target === zoomModal) closeZoom(); });
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeZoom(); });
 
             document.getElementById('buy-now').addEventListener('click', function () {
                 const btn = this;

@@ -7,6 +7,9 @@
     <meta name="description" content="Altus Gear is a North Vancouver sportswear brand making compression shirts, long sleeves, warm-up jackets and sports jackets for the trail, the gym, and everywhere between.">
     <link rel="icon" type="image/png" href="./assets/favicon.png">
     <link rel="icon" href="./assets/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Configure Tailwind for custom colors and fonts -->
@@ -50,13 +53,39 @@
         .image-overlay {
             background-color: rgba(0, 0, 0, 0.4); /* Dark overlay for better contrast */
         }
+
+        /* Nav gains a solid backing once the user scrolls past the hero */
+        #site-nav {
+            background-color: rgba(0, 0, 0, 0);
+            transition: background-color 0.3s ease, backdrop-filter 0.3s ease;
+        }
+        #site-nav.nav-scrolled {
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(6px);
+        }
+
+        /* Current-section indicator in the nav */
+        .nav-link.nav-current {
+            color: #fff;
+            text-decoration: underline;
+            text-underline-offset: 6px;
+        }
+
+        #back-to-top {
+            opacity: 0;
+            pointer-events: none;
+        }
+        #back-to-top.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
     </style>
 </head>
 
 <body class="font-sans bg-brand-white text-brand-black">
 
     <!-- Navbar -->
-    <nav class="absolute top-0 left-0 right-0 z-50 p-4 sm:p-6 text-brand-white">
+    <nav id="site-nav" class="fixed top-0 left-0 right-0 z-50 p-4 sm:p-6 text-brand-white">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <!-- Logo & Brand Name -->
             <div class="flex items-center space-x-3">
@@ -65,10 +94,11 @@
             </div>
 
             <!-- Navigation Links -->
-            <div class="space-x-8 text-sm md:text-base tracking-wider font-light" id="nav-links">
+            <div class="flex items-center space-x-6 sm:space-x-8 text-sm md:text-base tracking-wider font-light" id="nav-links">
                 <a href="products.html" class="hover:text-brand-accent transition duration-300">Products</a>
-                <a href="#bio" class="nav-link hover:text-brand-accent transition duration-300">Bio</a>
-                <a href="#contact" class="nav-link hover:text-brand-accent transition duration-300">Contact</a>
+                <a href="#bio" data-section="bio" class="nav-link hover:text-brand-accent transition duration-300">Bio</a>
+                <a href="#contact" data-section="contact" class="nav-link hover:text-brand-accent transition duration-300">Contact</a>
+                <span class="text-xs tracking-widest uppercase text-brand-white/60 border-l border-brand-white/30 pl-4 sm:pl-6">Cart (<span data-cart-count>0</span>)</span>
             </div>
         </div>
     </nav>
@@ -187,6 +217,13 @@
         </div>
     </footer>
 
+    <!-- Back to top -->
+    <button id="back-to-top" aria-label="Back to top" class="fixed bottom-6 right-6 z-40 w-11 h-11 rounded-full bg-brand-black text-brand-white shadow-lg flex items-center justify-center transition-opacity duration-300">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+    </button>
+
+    <script src="./assets/cart.js"></script>
+
     <!-- JavaScript for IntersectionObserver (Scroll Reveal) AND Smooth Scrolling -->
     <script>
         // --- IntersectionObserver (Scroll Reveal) Logic ---
@@ -212,6 +249,41 @@
             slideInElements.forEach(element => {
                 observer.observe(element);
             });
+        });
+
+        // --- Nav: solid background once scrolled past the hero, back-to-top visibility ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const nav = document.getElementById('site-nav');
+            const backToTop = document.getElementById('back-to-top');
+
+            window.addEventListener('scroll', () => {
+                const scrolled = window.scrollY > 80;
+                nav.classList.toggle('nav-scrolled', scrolled);
+                backToTop.classList.toggle('visible', window.scrollY > 500);
+            }, { passive: true });
+
+            backToTop.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+
+        // --- Scroll-spy: highlight Bio/Contact nav links for the section in view ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const sections = document.querySelectorAll('#bio, #contact');
+            const navLinksBySection = {};
+            document.querySelectorAll('.nav-link[data-section]').forEach(link => {
+                navLinksBySection[link.dataset.section] = link;
+            });
+
+            const spyObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const link = navLinksBySection[entry.target.id];
+                    if (!link) return;
+                    link.classList.toggle('nav-current', entry.isIntersecting);
+                });
+            }, { root: null, threshold: 0.4 });
+
+            sections.forEach(section => spyObserver.observe(section));
         });
 
         // --- Smooth Scrolling Navigation Logic ---
