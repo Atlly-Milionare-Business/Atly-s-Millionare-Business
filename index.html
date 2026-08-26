@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Altus Gear - Quality Sportswear</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configure Tailwind for custom colors and fonts -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-black': '#000000',
+                        'brand-white': '#ffffff',
+                        'brand-accent': '#e0e0e0', // Light grey for subtle elements
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Georgia', 'serif'],
+                    },
+                    spacing: {
+                        '128': '32rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Custom CSS for the Scroll Animation and Global Styles -->
+    <style>
+        /* General styling for the text slide-in effect */
+        .slide-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 1.2s ease-out, transform 1s ease-out;
+            will-change: opacity, transform;
+        }
+
+        /* Class added by IntersectionObserver when element is visible */
+        .slide-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Enforce high contrast for text on image backgrounds */
+        .image-overlay {
+            background-color: rgba(0, 0, 0, 0.4); /* Dark overlay for better contrast */
+        }
+    </style>
+</head>
+
+<body class="font-sans bg-brand-white text-brand-black">
+
+    <!-- Navbar -->
+    <nav class="absolute top-0 left-0 right-0 z-50 p-4 sm:p-6 text-brand-white">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <!-- Logo & Brand Name -->
+            <div class="flex items-center space-x-3">
+                <img src="./assets/logo-mark.png" alt="Altus Gear Logo" class="w-8 h-8 sm:w-10 sm:h-10 object-contain">
+                <span class="text-xl font-serif tracking-widest uppercase hidden md:block">ALTUS GEAR</span>
+            </div>
+
+            <!-- Navigation Links -->
+            <div class="space-x-8 text-sm md:text-base tracking-wider font-light" id="nav-links">
+                <a href="products.html" class="hover:text-brand-accent transition duration-300">Products</a>
+                <a href="#bio" class="nav-link hover:text-brand-accent transition duration-300">Bio</a>
+                <a href="#contact" class="nav-link hover:text-brand-accent transition duration-300">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 1. Hero Section -->
+    <header class="h-screen flex items-center justify-center text-brand-white relative overflow-hidden">
+        <div class="absolute inset-0 bg-cover bg-center bg-fixed"
+             style="background-image: url('./assets/bg-1.jpg');">
+        </div>
+
+        <div class="image-overlay absolute inset-0"></div>
+
+        <div class="relative z-10 text-center max-w-4xl px-4 slide-in">
+            <!-- Center Logo (Larger version) -->
+            <div class="mx-auto mb-6 w-24 h-24 sm:w-32 sm:h-32">
+                 <img src="./assets/logo-mark.png" alt="Altus Gear Center Logo" class="w-full h-full object-contain">
+            </div>
+
+            <h1 class="text-6xl sm:text-7xl lg:text-8xl font-serif uppercase tracking-widest mb-2 slide-in" style="transition-delay: 0.1s;">ALTUS GEAR</h1>
+            <p class="text-xl sm:text-2xl font-light tracking-widest uppercase mb-10 slide-in" style="transition-delay: 0.2s;">QUALITY SPORTSWEAR</p>
+            <!-- Updated motto text -->
+            <p class="text-2xl sm:text-3xl lg:text-4xl font-light italic slide-in" style="transition-delay: 0.3s;">
+                Move like the mountains, strong and free.
+            </p>
+        </div>
+    </header>
+
+    <!-- 2. Products Section -->
+    <section id="products" class="relative py-20 sm:py-32 overflow-hidden min-h-[70vh]">
+        <div class="absolute inset-0 bg-cover bg-center"
+             style="background-image: url('./assets/bg-2.jpg'); background-attachment: fixed;">
+        </div>
+        <div class="image-overlay absolute inset-0"></div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-4 text-brand-white">
+            <div class="grid md:grid-cols-2 gap-10">
+                <!-- Text Content Column -->
+                <div class="flex flex-col justify-center py-8">
+                    <h2 class="text-5xl sm:text-6xl font-serif uppercase tracking-wider mb-6 pb-2 border-b border-brand-accent/50 max-w-xs slide-in">
+                        PRODUCTS
+                    </h2>
+                    <p class="text-lg font-light leading-relaxed mb-10 max-w-md slide-in" style="transition-delay: 0.2s;">
+                        WE HAVE A VARIETY OF OPTIONS FOR MEN, INCLUDING COMPRESSION SHIRTS, LONG SLEEVED, COMMODITY SHIRTS, WARM-UP JACKETS AND SPORTS JACKETS. ALL HAVE A CHOICE OF SIZES AND COLOURS.
+                    </p>
+                    <a href="products.html" class="inline-block px-8 py-3 bg-brand-black text-brand-white text-sm tracking-widest font-medium uppercase border-2 border-brand-white hover:bg-brand-white hover:text-brand-black transition duration-500 max-w-max slide-in" style="transition-delay: 0.4s;">
+                        CUSTOMISE AND PURCHASE
+                    </a>
+                </div>
+
+                <!-- Model Image Column -->
+                <div class="flex items-center justify-end">
+                    <div class="w-full max-w-md slide-in" style="transition-delay: 0.6s;">
+                        <img src="https://placehold.co/400x600/000000/FFFFFF?text=UPLOAD+MODEL+IMAGE"
+                            onerror="this.onerror=null; this.src='https://placehold.co/400x600/000000/FFFFFF?text=UPLOAD+MODEL+IMAGE';"
+                            alt="Male models wearing Altus Gear sportswear" class="w-full h-auto object-cover rounded shadow-lg opacity-90">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Our Bio Section -->
+    <section id="bio" class="relative py-20 sm:py-32 overflow-hidden min-h-[80vh]">
+        <div class="absolute inset-0 bg-cover bg-center"
+             style="background-image: url('./assets/bg-1.jpg'); background-attachment: fixed;">
+        </div>
+        <div class="image-overlay absolute inset-0 bg-opacity-70"></div>
+
+        <div class="relative z-10 max-w-5xl mx-auto px-4 text-brand-white">
+            <h2 class="text-5xl sm:text-6xl font-serif uppercase tracking-wider mb-8 pb-2 border-b border-brand-accent/50 max-w-xs slide-in">
+                OUR BIO
+            </h2>
+            <div class="bg-brand-black/50 p-6 rounded-lg slide-in" style="transition-delay: 0.2s;">
+                <p class="text-lg font-light leading-relaxed italic mb-4">
+                    At the heart of Lynn Valley, Vancouver, we are a young team dedicated to redefining sportswear through accessibility and exceptional quality. Inspired by the beauty of North Vancouver, our mission is to empower individuals to embrace an active lifestyle—whether on the trails, in the gym, or beyond.
+                </p>
+                <p class="text-lg font-light leading-relaxed">
+                    Every product we create embodies the spirit of our community, combining functionality with a connection to the natural world around us. As a growing local business, we value the feedback and support of our customers who share our vision.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Footer/Contact Section -->
+    <footer id="contact" class="bg-brand-black text-brand-white py-12 sm:py-20">
+        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-10 slide-in" style="transition-delay: 0.1s;">
+            <!-- Contact Information -->
+            <div>
+                <h3 class="text-2xl font-serif uppercase tracking-wider mb-4 border-b border-brand-accent/50 inline-block">
+                    Contact
+                </h3>
+                <address class="not-italic text-lg font-light space-y-2">
+                    <p>North Vancouver, BC, Canada, V7J</p>
+                    <p>604-401-0276</p>
+                    <p><a href="mailto:ALTUSGEARNV@gmail.com" class="hover:text-brand-accent transition duration-300">ALTUSGEARNV@gmail.com</a></p>
+                </address>
+            </div>
+
+            <!-- Stay Connected -->
+            <div>
+                <h3 class="text-2xl font-serif uppercase tracking-wider mb-4 border-b border-brand-accent/50 inline-block">
+                    STAY CONNECTED
+                </h3>
+                <div class="flex items-center space-x-4">
+                    <!-- Instagram Icon Placeholder (using inline SVG for simplicity) -->
+                    <a href="https://instagram.com/altus_gear" target="_blank" class="text-brand-white hover:text-brand-accent transition duration-300">
+                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
+                            <path d="M16 3h.01"></path>
+                            <path d="M16 8a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"></path>
+                            <path d="M17.5 12.5c0 2.485-2.015 4.5-4.5 4.5s-4.5-2.015-4.5-4.5S10.515 8 13 8s4.5 2.015 4.5 4.5z"></path>
+                        </svg>
+                    </a>
+                    <span class="text-lg font-light">@altus_gear</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript for IntersectionObserver (Scroll Reveal) AND Smooth Scrolling -->
+    <script>
+        // --- IntersectionObserver (Scroll Reveal) Logic ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const slideInElements = document.querySelectorAll('.slide-in');
+            const observerOptions = {
+                root: null, // viewport
+                rootMargin: '0px',
+                threshold: 0.1 // Trigger when 10% of the element is visible
+            };
+
+            const observerCallback = (entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            };
+
+            const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+            slideInElements.forEach(element => {
+                observer.observe(element);
+            });
+        });
+
+        // --- Smooth Scrolling Navigation Logic ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Select all navigation links with the .nav-link class
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Prevent the default anchor jump
+                    e.preventDefault();
+
+                    // Get the target section's ID (e.g., '#products')
+                    const targetId = this.getAttribute('href');
+
+                    // Get the actual DOM element for the target
+                    const targetElement = document.querySelector(targetId);
+
+                    if (targetElement) {
+                        // Use smooth scrolling to move to the target element
+                        window.scrollTo({
+                            top: targetElement.offsetTop,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

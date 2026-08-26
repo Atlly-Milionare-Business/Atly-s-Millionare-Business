@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Altus Gear - Products</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-black': '#000000',
+                        'brand-white': '#ffffff',
+                        'brand-grey': '#f2f2f2',
+                        'brand-accent': '#8a8a8a',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Georgia', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Crossfade hover: back image fades in over front image */
+        .product-card .img-back {
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        .product-card:hover .img-back {
+            opacity: 1;
+        }
+        .filter-pill {
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .filter-pill.active {
+            background-color: #000;
+            color: #fff;
+        }
+    </style>
+</head>
+<body class="font-sans bg-brand-white text-brand-black">
+
+    <!-- Top Nav -->
+    <nav class="border-b border-black/10">
+        <div class="max-w-7xl mx-auto flex justify-between items-center px-4 sm:px-6 py-4">
+            <a href="index.html" class="flex items-center space-x-3">
+                <img src="./assets/logo-mark.png" alt="Altus Gear Logo" class="w-8 h-8 object-contain invert">
+                <span class="text-lg font-serif tracking-widest uppercase hidden md:block">ALTUS GEAR</span>
+            </a>
+            <div class="space-x-8 text-sm tracking-wider font-light">
+                <a href="index.html" class="hover:text-brand-accent transition duration-300">Home</a>
+                <a href="products.html" class="hover:text-brand-accent transition duration-300">Products</a>
+                <a href="index.html#bio" class="hover:text-brand-accent transition duration-300">Bio</a>
+                <a href="index.html#contact" class="hover:text-brand-accent transition duration-300">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-8 pb-4">
+        <p class="text-sm text-brand-accent tracking-wide">
+            <a href="index.html" class="hover:text-brand-black transition">Shop</a>
+            <span class="mx-2">&gt;</span>
+            <span class="text-brand-black">Products</span>
+        </p>
+    </div>
+
+    <!-- Filter / count bar -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 pb-8 flex flex-wrap items-center justify-between gap-4 border-b border-black/10">
+        <p id="item-count" class="text-sm text-brand-accent tracking-wide">8 items</p>
+        <div class="flex flex-wrap gap-2 text-sm tracking-wide" id="filter-bar">
+            <button class="filter-pill active px-4 py-1.5 rounded-full border border-black/20" data-filter="all">All</button>
+            <button class="filter-pill px-4 py-1.5 rounded-full border border-black/20" data-filter="compression">Compression Shirts</button>
+            <button class="filter-pill px-4 py-1.5 rounded-full border border-black/20" data-filter="longsleeve">Long Sleeve</button>
+            <button class="filter-pill px-4 py-1.5 rounded-full border border-black/20" data-filter="warmup">Warm-Up Jackets</button>
+            <button class="filter-pill px-4 py-1.5 rounded-full border border-black/20" data-filter="sports">Sports Jackets</button>
+        </div>
+    </div>
+
+    <!-- Product Grid -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+        <div id="product-grid" class="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-12">
+
+            <!-- Product 1 -->
+            <a href="#" class="product-card group block" data-category="compression">
+                <div class="relative bg-brand-grey aspect-square overflow-hidden">
+                    <img src="./assets/shirt-front.jpg" alt="Compression Shirt Charcoal - front" class="img-front absolute inset-0 w-full h-full object-contain">
+                    <img src="./assets/shirt-back.jpg" alt="Compression Shirt Charcoal - back" class="img-back absolute inset-0 w-full h-full object-contain">
+                </div>
+                <div class="mt-3 flex justify-between items-start text-sm">
+                    <div>
+                        <p class="font-medium">Compression Shirt — Charcoal</p>
+                        <p class="text-brand-accent text-xs mt-1">4 colours</p>
+                    </div>
+                    <p class="font-medium">$65</p>
+                </div>
+            </a>
+
+            <!-- Product 2 -->
+            <a href="#" class="product-card group block" data-category="compression">
+                <div class="relative bg-brand-grey aspect-square overflow-hidden">
+                    <img src="https://placehold.co/600x600/f2f2f2/999999?text=Compression+Shirt%0AFront" alt="Compression Shirt Storm Blue - front" class="img-front absolute inset-0 w-full h-full object-cover">
+                    <img src="https://placehold.co/600x600/e6e6e6/999999?text=Compression+Shirt%0ABack" alt="Compression Shirt Storm Blue - back" class="img-back absolute inset-0 w-full h-full object-cover">
+                </div>
+                <div class="mt-3 flex justify-between items-start text-sm">
+                    <div>
+                        <p class="font-medium">Compression Shirt — Storm Blue</p>
+                        <p class="text-brand-accent text-xs mt-1">4 colours</p>
+                    </div>
+                    <p class="font-medium">$65</p>
+                </div>
+            </a>
+
+            <!-- Product 3 -->
+            <a href="#" class="product-card group block" data-category="longsleeve">
+                <div class="relative bg-brand-grey aspect-square overflow-hidden">
+                    <img src="https://placehold.co/600x600/f2f2f2/999999?text=Long+Sleeve+Tee%0AFront" alt="Long Sleeve Tee Black - front" class="img-front absolute inset-0 w-full h-full object-cover">
+                    <img src="https://placehold.co/600x600/e6e6e6/999999?text=Long+Sleeve+Tee%0ABack" alt="Long Sleeve Tee Black - back" class="img-back absolute inset-0 w-full h-full object-cover">
+                </div>
+                <div class="mt-3 flex justify-between items-start text-sm">
+                    <div>
+                        <p class="font-medium">Long Sleeve Tee — Black</p>
+                        <p class="text-brand-accent text-xs mt-1">3 colours</p>
+                    </div>
+                    <p class="font-medium">$55</p>
+                </div>
+            </a>
+
+            <!-- Product 4 -->
+            <a href="#" class="product-card group block" data-category="longsleeve">
+                <div class="relative bg-brand-grey aspect-square overflow-hidden">
+                    <img src="https://placehold.co/600x600/f2f2f2/999999?text=Long+Sleeve+Tee%0AFront" alt="Long Sleeve Tee Alpine White - front" class="img-front absolute inset-0 w-full h-full object-cover">
+                    <img src="https://placehold.co/600x600/e6e6e6/999999?text=Long+Sleeve+Tee%0ABack" alt="Long Sleeve Tee Alpine White - back" class="img-back absolute inset-0 w-full h-full object-cover">
+                </div>
+                <div class="mt-3 flex justify-between items-start text-sm">
+                    <div>
+                        <p class="font-medium">Long Sleeve Tee — Alpine White</p>
+                        <p class="text-brand-accent text-xs mt-1">3 colours</p>
+                    </div>
+                    <p class="font-medium">$55</p>
+                </div>
+            </a>
+
+            <!-- Product 5 -->
+            <a href="#" class="product-card group block" data-category="warmup">
+                <div class="relative bg-brand-grey aspect-square overflow-hidden">
+                    <img src="https://placehold.co/600x600/f2f2f2/999999?text=Warm-Up+Jacket%0AFront" alt="Warm-Up Jacket Onyx - front" class="img-front absolute inset-0 w-full h-full object-cover">
+                    <img src="https://placehold.co/600x600/e6e6e6/999999?text=Warm-Up+Jacket%0ABack" alt="Warm-Up Jacket Onyx - back" class="img-back absolute inset-0 w-full h-full object-cover">
+                </div>
+                <div class="mt-3 flex justify-between items-start text-sm">
+                    <div>
+                        <p class="font-medium">Warm-Up Jacket — Onyx</p>
+                        <p class="text-brand-accent text-xs mt-1">5 colours</p>
+                    </div>
+                    <p class="font-medium">$120</p>
+                </div>
+            </a>
+
+            <!-- Product 6 -->
+            <a href="#" class="product-card group block" data-category="warmup">
+                <div class="relative bg-brand-grey aspect-square overflow-hidden">
+                    <img src="https://placehold.co/600x600/f2f2f2/999999?text=Warm-Up+Jacket%0AFront" alt="Warm-Up Jacket Slate Grey - front" class="img-front absolute inset-0 w-full h-full object-cover">
+                    <img src="https://placehold.co/600x600/e6e6e6/999999?text=Warm-Up+Jacket%0ABack" alt="Warm-Up Jacket Slate Grey - back" class="img-back absolute inset-0 w-full h-full object-cover">
+                </div>
+                <div class="mt-3 flex justify-between items-start text-sm">
+                    <div>
+                        <p class="font-medium">Warm-Up Jacket — Slate Grey</p>
+                        <p class="text-brand-accent text-xs mt-1">5 colours</p>
+                    </div>
+                    <p class="font-medium">$120</p>
+                </div>
+            </a>
+
+            <!-- Product 7 -->
+            <a href="#" class="product-card group block" data-category="sports">
+                <div class="relative bg-brand-grey aspect-square overflow-hidden">
+                    <img src="https://placehold.co/600x600/f2f2f2/999999?text=Sports+Jacket%0AFront" alt="Sports Jacket Summit Black - front" class="img-front absolute inset-0 w-full h-full object-cover">
+                    <img src="https://placehold.co/600x600/e6e6e6/999999?text=Sports+Jacket%0ABack" alt="Sports Jacket Summit Black - back" class="img-back absolute inset-0 w-full h-full object-cover">
+                </div>
+                <div class="mt-3 flex justify-between items-start text-sm">
+                    <div>
+                        <p class="font-medium">Sports Jacket — Summit Black</p>
+                        <p class="text-brand-accent text-xs mt-1">3 colours</p>
+                    </div>
+                    <p class="font-medium">$145</p>
+                </div>
+            </a>
+
+            <!-- Product 8 -->
+            <a href="#" class="product-card group block" data-category="sports">
+                <div class="relative bg-brand-grey aspect-square overflow-hidden">
+                    <img src="https://placehold.co/600x600/f2f2f2/999999?text=Sports+Jacket%0AFront" alt="Sports Jacket Ridge Green - front" class="img-front absolute inset-0 w-full h-full object-cover">
+                    <img src="https://placehold.co/600x600/e6e6e6/999999?text=Sports+Jacket%0ABack" alt="Sports Jacket Ridge Green - back" class="img-back absolute inset-0 w-full h-full object-cover">
+                </div>
+                <div class="mt-3 flex justify-between items-start text-sm">
+                    <div>
+                        <p class="font-medium">Sports Jacket — Ridge Green</p>
+                        <p class="text-brand-accent text-xs mt-1">3 colours</p>
+                    </div>
+                    <p class="font-medium">$145</p>
+                </div>
+            </a>
+
+        </div>
+    </main>
+
+    <script>
+        // Filter bar logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const pills = document.querySelectorAll('.filter-pill');
+            const cards = document.querySelectorAll('.product-card');
+            const itemCount = document.getElementById('item-count');
+
+            pills.forEach(pill => {
+                pill.addEventListener('click', () => {
+                    pills.forEach(p => p.classList.remove('active'));
+                    pill.classList.add('active');
+
+                    const filter = pill.dataset.filter;
+                    let visibleCount = 0;
+
+                    cards.forEach(card => {
+                        const match = filter === 'all' || card.dataset.category === filter;
+                        card.style.display = match ? '' : 'none';
+                        if (match) visibleCount++;
+                    });
+
+                    itemCount.textContent = `${visibleCount} item${visibleCount !== 1 ? 's' : ''}`;
+                });
+            });
+        });
+    </script>
+</body>
+</html>
