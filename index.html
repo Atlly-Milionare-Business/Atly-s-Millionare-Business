@@ -86,7 +86,7 @@
             backface-visibility: hidden;
         }
         #hero-tagline.flip {
-            animation: tagline-flip 0.5s cubic-bezier(0.3, 0, 0.2, 1);
+            animation: tagline-flip 0.25s cubic-bezier(0.3, 0, 0.2, 1);
         }
         @keyframes tagline-flip {
             0% { transform: rotateX(-90deg); opacity: 0; }
@@ -278,7 +278,7 @@
                 '装备齐全，无所不达。',                        // Chinese
                 'GEARED FOR EVERYWHERE YOU GO.'           // English (final)
             ];
-            var STEP_MS = 500; // 8 steps x 500ms = 4s total
+            var STEP_MS = 250; // 8 steps x 250ms = 2s total
 
             function showStep(i) {
                 el.textContent = TAGLINES[i];
