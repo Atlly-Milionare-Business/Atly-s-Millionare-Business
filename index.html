@@ -79,6 +79,20 @@
             opacity: 1;
             pointer-events: auto;
         }
+
+        /* Language flip-box effect on the hero tagline */
+        #hero-tagline {
+            transform-origin: top center;
+            backface-visibility: hidden;
+        }
+        #hero-tagline.flip {
+            animation: tagline-flip 0.5s cubic-bezier(0.3, 0, 0.2, 1);
+        }
+        @keyframes tagline-flip {
+            0% { transform: rotateX(-90deg); opacity: 0; }
+            60% { transform: rotateX(12deg); opacity: 1; }
+            100% { transform: rotateX(0deg); opacity: 1; }
+        }
     </style>
 </head>
 
@@ -125,7 +139,9 @@
             </div>
 
             <h1 class="text-6xl sm:text-7xl lg:text-8xl font-serif uppercase tracking-widest mb-2 slide-in" style="transition-delay: 0.1s;">ALTUS GEAR</h1>
-            <p class="text-xl sm:text-2xl font-light tracking-widest uppercase slide-in" style="transition-delay: 0.2s;">GEARED FOR EVERYWHERE YOU GO.</p>
+            <p class="text-xl sm:text-2xl font-light tracking-widest uppercase slide-in" style="transition-delay: 0.2s; perspective: 500px;">
+                <span id="hero-tagline" class="inline-block">GEARED FOR EVERYWHERE YOU GO.</span>
+            </p>
         </div>
     </header>
 
@@ -244,6 +260,45 @@
     </button>
 
     <script src="./assets/cart.js"></script>
+
+    <!-- Hero tagline language flip-box intro (4s, lands on English) -->
+    <script>
+        (function () {
+            var el = document.getElementById('hero-tagline');
+            if (!el) return;
+
+            // "Geared for everywhere you go." in each language, English last.
+            var TAGLINES = [
+                'EQUIPADO PARA IR A CUALQUIER LUGAR.',   // Spanish
+                'どこへでも行ける装備。',                    // Japanese
+                'ГОТОВЫ К ЛЮБОМУ ПУТИ.',                  // Russian
+                'EQUIPADO PARA QUALQUER LUGAR.',          // Portuguese
+                'BEREIT FÜR JEDEN ORT.',                  // German
+                'PRONTO PER OGNI LUOGO.',                 // Italian
+                '装备齐全，无所不达。',                        // Chinese
+                'GEARED FOR EVERYWHERE YOU GO.'           // English (final)
+            ];
+            var STEP_MS = 500; // 8 steps x 500ms = 4s total
+
+            function showStep(i) {
+                el.textContent = TAGLINES[i];
+                el.classList.remove('flip');
+                void el.offsetWidth; // restart the CSS animation
+                el.classList.add('flip');
+            }
+
+            var step = 0;
+            showStep(step);
+            var timer = setInterval(function () {
+                step++;
+                if (step >= TAGLINES.length) {
+                    clearInterval(timer);
+                    return;
+                }
+                showStep(step);
+            }, STEP_MS);
+        })();
+    </script>
 
     <!-- JavaScript for IntersectionObserver (Scroll Reveal) AND Smooth Scrolling -->
     <script>
