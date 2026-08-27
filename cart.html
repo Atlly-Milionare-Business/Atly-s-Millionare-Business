@@ -95,7 +95,7 @@
                         <span>Subtotal</span>
                         <span id="cart-subtotal">$0.00</span>
                     </div>
-                    <p class="text-xs text-brand-accent mb-6">Shipping and taxes calculated at checkout.</p>
+                    <p class="text-xs text-brand-accent mb-6">Shipping calculated at checkout. Currently shipping within Canada only. See our <a href="index.html#shipping-returns" class="underline hover:text-brand-black transition">shipping &amp; returns policy</a>.</p>
                     <button id="checkout-btn" class="checkout-btn w-full bg-black text-white py-3 text-sm tracking-widest uppercase font-medium hover:bg-brand-accent transition">
                         Proceed to Checkout
                     </button>
@@ -252,9 +252,9 @@
         });
 
         // Coming back from a successful Stripe payment: show a thank-you
-        // banner and clear the local cart. This trusts the redirect alone —
-        // there's no server-side order record yet (that needs a Stripe
-        // webhook writing to a Supabase table, not built yet).
+        // banner and clear the local cart. The order itself is recorded
+        // server-side by the stripe-webhook function (checkout.session.completed
+        // -> Supabase `orders` table), independent of this redirect.
         if (new URLSearchParams(window.location.search).get('checkout') === 'success') {
             window.AltusCart.getItems().forEach(() => {});
             localStorage.removeItem('altus_cart_items');
