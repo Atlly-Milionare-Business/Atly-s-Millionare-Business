@@ -39,6 +39,13 @@
             transition: max-height 0.3s ease;
         }
         .add-to-cart-btn.added { background-color: #16a34a !important; border-color: #16a34a !important; }
+        #add-to-cart:disabled, #buy-now:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: transparent !important;
+            color: #000 !important;
+            border-color: #000 !important;
+        }
         #main-image { transition: opacity 0.2s ease; cursor: zoom-in; }
         .nav-current {
             font-weight: 600;
@@ -63,14 +70,22 @@
                 <a href="products.html" data-nav="products.html" class="hover:text-brand-accent transition duration-300">Products</a>
                 <a href="index.html#bio" class="hover:text-brand-accent transition duration-300">Bio</a>
                 <a href="index.html#contact" class="hover:text-brand-accent transition duration-300">Contact</a>
-                <a href="cart.html" aria-label="View cart" class="relative inline-flex items-center pl-4 sm:pl-6 border-l border-black/20 hover:text-brand-accent transition duration-300">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="8" cy="21" r="1"></circle>
-                        <circle cx="19" cy="21" r="1"></circle>
-                        <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
-                    </svg>
-                    <span data-cart-badge class="hidden absolute -top-2 -right-2 min-w-[16px] h-4 px-1 rounded-full bg-black text-white text-[10px] font-medium leading-4 text-center">0</span>
-                </a>
+                <div class="flex items-center gap-4 sm:gap-5 pl-4 sm:pl-6 border-l border-black/20">
+                    <a href="login.html" data-profile-link aria-label="Account" class="hover:text-brand-accent transition duration-300">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </a>
+                    <a href="cart.html" aria-label="View cart" class="relative inline-flex items-center hover:text-brand-accent transition duration-300">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="8" cy="21" r="1"></circle>
+                            <circle cx="19" cy="21" r="1"></circle>
+                            <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
+                        </svg>
+                        <span data-cart-badge class="hidden absolute -top-2 -right-2 min-w-[16px] h-4 px-1 rounded-full bg-black text-white text-[10px] font-medium leading-4 text-center">0</span>
+                    </a>
+                </div>
             </div>
         </div>
     </nav>
@@ -182,6 +197,8 @@
     </div>
 
     <script src="./assets/cart.js"></script>
+    <script src="./assets/auth.js"></script>
+    <script src="./assets/inventory.js"></script>
     <script>
         // Mark the current page's nav link
         document.addEventListener('DOMContentLoaded', () => {
@@ -275,6 +292,15 @@
             });
 
             document.getElementById('qty-value').textContent = String(state.qty).padStart(2, '0');
+
+            // Sold out: lock both CTA buttons and swap their labels.
+            const soldOut = window.AltusInventory.isSoldOut(id);
+            const addToCartBtn = document.getElementById('add-to-cart');
+            const buyNowBtn = document.getElementById('buy-now');
+            addToCartBtn.disabled = soldOut;
+            buyNowBtn.disabled = soldOut;
+            addToCartBtn.textContent = soldOut ? 'Sold out' : 'Add to cart';
+            buyNowBtn.textContent = soldOut ? 'Sold out' : 'Buy it now';
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -302,8 +328,9 @@
 
             document.getElementById('add-to-cart').addEventListener('click', function () {
                 const btn = this;
-                const original = btn.textContent;
                 const id = getIdFromUrl();
+                if (window.AltusInventory.isSoldOut(id)) return;
+                const original = btn.textContent;
                 const product = PRODUCTS[id];
                 window.AltusCart.addItem({
                     id: id,
@@ -327,8 +354,9 @@
 
             document.getElementById('buy-now').addEventListener('click', async function () {
                 const btn = this;
-                const original = btn.textContent;
                 const id = getIdFromUrl();
+                if (window.AltusInventory.isSoldOut(id)) return;
+                const original = btn.textContent;
                 const product = PRODUCTS[id];
 
                 btn.disabled = true;

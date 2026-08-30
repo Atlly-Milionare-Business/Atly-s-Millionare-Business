@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Altus Gear - Manage Stock</title>
+    <meta name="robots" content="noindex">
+    <link rel="icon" type="image/png" href="./assets/favicon.png">
+    <link rel="icon" href="./assets/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-black': '#000000',
+                        'brand-white': '#ffffff',
+                        'brand-grey': '#f2f2f2',
+                        'brand-accent': '#8a8a8a',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Georgia', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="./assets/auth.js"></script>
+    <script>
+        // Gate this page before it paints anything.
+        if (!window.AltusAuth.isAuthed()) {
+            window.location.replace('login.html');
+        }
+    </script>
+</head>
+<body class="font-sans bg-brand-white text-brand-black">
+
+    <!-- Top Nav -->
+    <nav class="border-b border-black/10">
+        <div class="max-w-7xl mx-auto flex justify-between items-center px-4 sm:px-6 py-4">
+            <a href="index.html" class="flex items-center space-x-3">
+                <img src="./assets/logo-mark.png" alt="Altus Gear Logo" class="w-8 h-8 object-contain invert">
+                <span class="text-lg font-serif tracking-widest uppercase hidden md:block">ALTUS GEAR</span>
+            </a>
+            <div class="flex items-center gap-6 text-sm tracking-wider font-light">
+                <a href="index.html" class="hover:text-brand-accent transition duration-300">Back to site</a>
+                <button id="logout-btn" class="hover:text-brand-accent transition duration-300">Sign Out</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-2xl mx-auto px-4 sm:px-6 py-16">
+        <h1 class="text-3xl font-serif uppercase tracking-wide mb-2">Manage Stock</h1>
+        <p class="text-sm text-brand-accent mb-10">
+            Set how many units are left of each product. When a product's stock hits 0, its "Add to cart" and "Buy it now" buttons on the site automatically switch to "Sold out."
+        </p>
+
+        <form id="stock-form">
+            <div id="stock-rows" class="border-t border-black/10"></div>
+
+            <button type="submit" class="mt-8 bg-black text-white py-3 px-8 text-sm tracking-widest uppercase font-medium hover:bg-brand-accent transition">
+                Save Stock
+            </button>
+            <span id="saved-msg" class="hidden ml-4 text-sm text-green-700">Saved ✓</span>
+        </form>
+    </main>
+
+    <script src="./assets/inventory.js"></script>
+    <script>
+        const PRODUCTS = {
+            1: { name: 'Cross-Body Bag — Black', image: './assets/bag-black.jpg' },
+            2: { name: 'Cross-Body Bag — Grey', image: './assets/bag-grey.jpg' },
+            3: { name: 'Cross-Body Bag — Navy', image: './assets/bag-navy.jpg' }
+        };
+
+        const rows = document.getElementById('stock-rows');
+        Object.keys(PRODUCTS).forEach((id) => {
+            const product = PRODUCTS[id];
+            const row = document.createElement('div');
+            row.className = 'flex items-center gap-4 py-5 border-b border-black/10';
+            row.innerHTML = `
+                <div class="w-16 h-16 bg-brand-grey flex-shrink-0 overflow-hidden">
+                    <img src="${product.image}" alt="${product.name}" class="w-full h-full object-contain">
+                </div>
+                <p class="flex-1 font-medium">${product.name}</p>
+                <input type="number" min="0" step="1" data-stock-input="${id}"
+                    value="${window.AltusInventory.getStock(id)}"
+                    class="w-24 border border-black/20 px-3 py-2 text-sm text-right focus:outline-none focus:border-black transition">
+            `;
+            rows.appendChild(row);
+        });
+
+        document.getElementById('stock-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            document.querySelectorAll('[data-stock-input]').forEach((input) => {
+                window.AltusInventory.setStock(input.dataset.stockInput, input.value);
+            });
+            const msg = document.getElementById('saved-msg');
+            msg.classList.remove('hidden');
+            setTimeout(() => msg.classList.add('hidden'), 2000);
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', function () {
+            window.AltusAuth.logout();
+            window.location.href = 'login.html';
+        });
+    </script>
+</body>
+</html>

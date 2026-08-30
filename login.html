@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Altus Gear - Sign In</title>
+    <meta name="robots" content="noindex">
+    <link rel="icon" type="image/png" href="./assets/favicon.png">
+    <link rel="icon" href="./assets/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-black': '#000000',
+                        'brand-white': '#ffffff',
+                        'brand-grey': '#f2f2f2',
+                        'brand-accent': '#8a8a8a',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Georgia', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-sans bg-brand-white text-brand-black">
+
+    <!-- Top Nav -->
+    <nav class="border-b border-black/10">
+        <div class="max-w-7xl mx-auto flex justify-between items-center px-4 sm:px-6 py-4">
+            <a href="index.html" class="flex items-center space-x-3">
+                <img src="./assets/logo-mark.png" alt="Altus Gear Logo" class="w-8 h-8 object-contain invert">
+                <span class="text-lg font-serif tracking-widest uppercase hidden md:block">ALTUS GEAR</span>
+            </a>
+            <a href="index.html" class="text-sm tracking-wider font-light hover:text-brand-accent transition duration-300">Back to site</a>
+        </div>
+    </nav>
+
+    <main class="max-w-sm mx-auto px-4 sm:px-6 py-20 sm:py-28">
+        <h1 class="text-3xl font-serif uppercase tracking-wide mb-2 text-center">Sign In</h1>
+        <p class="text-sm text-brand-accent text-center mb-10">Store owner access only.</p>
+
+        <form id="login-form" novalidate>
+            <div class="mb-5">
+                <label for="username" class="block text-sm font-medium tracking-wide mb-2">Email or Username</label>
+                <input id="username" name="username" type="text" autocomplete="username"
+                    class="w-full border border-black/20 px-4 py-3 text-sm focus:outline-none focus:border-black transition">
+            </div>
+            <div class="mb-2">
+                <label for="password" class="block text-sm font-medium tracking-wide mb-2">Password</label>
+                <input id="password" name="password" type="password" autocomplete="current-password"
+                    class="w-full border border-black/20 px-4 py-3 text-sm focus:outline-none focus:border-black transition">
+            </div>
+
+            <p id="login-error" class="hidden text-sm text-red-600 mt-3 mb-2">Incorrect email/username or password.</p>
+
+            <button type="submit" class="w-full mt-6 bg-black text-white py-3 text-sm tracking-widest uppercase font-medium hover:bg-brand-accent transition">
+                Sign In
+            </button>
+        </form>
+    </main>
+
+    <script src="./assets/auth.js"></script>
+    <script>
+        // Already signed in this session — skip straight to the admin page.
+        if (window.AltusAuth.isAuthed()) {
+            window.location.replace('admin.html');
+        }
+
+        document.getElementById('login-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errorEl = document.getElementById('login-error');
+
+            if (window.AltusAuth.login(username, password)) {
+                window.location.href = 'admin.html';
+            } else {
+                errorEl.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
