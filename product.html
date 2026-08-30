@@ -90,19 +90,8 @@
         </div>
     </nav>
 
-    <!-- Breadcrumb -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-8 pb-4">
-        <p class="text-sm text-brand-accent tracking-wide">
-            <a href="index.html" class="hover:text-brand-black transition">Shop</a>
-            <span class="mx-2">&gt;</span>
-            <a href="products.html" class="hover:text-brand-black transition">Products</a>
-            <span class="mx-2">&gt;</span>
-            <span id="crumb-name" class="text-brand-black">&nbsp;</span>
-        </p>
-    </div>
-
     <!-- Product Detail -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 pb-24">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 pt-10 pb-24">
         <div class="grid md:grid-cols-2 gap-10 lg:gap-16">
 
             <!-- Gallery Column -->
@@ -139,7 +128,7 @@
                     <p class="text-sm font-medium tracking-wide mb-3">Quantity</p>
                     <div class="inline-flex items-center border border-black/20">
                         <button id="qty-minus" class="w-10 h-10 flex items-center justify-center hover:bg-brand-grey transition">&minus;</button>
-                        <span id="qty-value" class="w-10 text-center text-sm">01</span>
+                        <span id="qty-value" class="w-10 text-center text-sm">1</span>
                         <button id="qty-plus" class="w-10 h-10 flex items-center justify-center hover:bg-brand-grey transition">+</button>
                     </div>
                 </div>
@@ -246,7 +235,6 @@
             const product = PRODUCTS[id];
 
             document.title = 'Altus Gear - ' + product.name;
-            document.getElementById('crumb-name').textContent = product.name;
             document.getElementById('product-name').textContent = product.name;
             document.getElementById('product-price').textContent = '$' + product.price.toFixed(2);
             document.getElementById('color-label').textContent = product.colorName;
@@ -291,7 +279,7 @@
                 colorRow.appendChild(link);
             });
 
-            document.getElementById('qty-value').textContent = String(state.qty).padStart(2, '0');
+            document.getElementById('qty-value').textContent = String(state.qty);
 
             // Sold out: lock both CTA buttons and swap their labels.
             // state.soldOut is resolved once (async, from Supabase) before
