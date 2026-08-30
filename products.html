@@ -124,10 +124,13 @@
                 if (a.dataset.nav === path) a.classList.add('nav-current');
             });
 
-            document.querySelectorAll('[data-product-id]').forEach((card) => {
-                if (window.AltusInventory.isSoldOut(card.dataset.productId)) {
-                    card.querySelector('[data-sold-out-badge]').classList.remove('hidden');
-                }
+            window.AltusInventory.getAll().then((stock) => {
+                document.querySelectorAll('[data-product-id]').forEach((card) => {
+                    const qty = stock[card.dataset.productId];
+                    if (typeof qty === 'number' && qty <= 0) {
+                        card.querySelector('[data-sold-out-badge]').classList.remove('hidden');
+                    }
+                });
             });
         });
     </script>

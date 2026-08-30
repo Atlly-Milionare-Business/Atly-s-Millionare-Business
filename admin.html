@@ -78,30 +78,66 @@
         };
 
         const rows = document.getElementById('stock-rows');
-        Object.keys(PRODUCTS).forEach((id) => {
-            const product = PRODUCTS[id];
-            const row = document.createElement('div');
-            row.className = 'flex items-center gap-4 py-5 border-b border-black/10';
-            row.innerHTML = `
-                <div class="w-16 h-16 bg-brand-grey flex-shrink-0 overflow-hidden">
-                    <img src="${product.image}" alt="${product.name}" class="w-full h-full object-contain">
-                </div>
-                <p class="flex-1 font-medium">${product.name}</p>
-                <input type="number" min="0" step="1" data-stock-input="${id}"
-                    value="${window.AltusInventory.getStock(id)}"
-                    class="w-24 border border-black/20 px-3 py-2 text-sm text-right focus:outline-none focus:border-black transition">
-            `;
-            rows.appendChild(row);
-        });
+        const stockForm = document.getElementById('stock-form');
+        const saveBtn = stockForm.querySelector('button[type="submit"]');
+        const savedMsg = document.getElementById('saved-msg');
 
-        document.getElementById('stock-form').addEventListener('submit', function (e) {
-            e.preventDefault();
-            document.querySelectorAll('[data-stock-input]').forEach((input) => {
-                window.AltusInventory.setStock(input.dataset.stockInput, input.value);
+        function showMessage(text, isError) {
+            savedMsg.textContent = text;
+            savedMsg.classList.remove('hidden', 'text-green-700', 'text-red-600');
+            savedMsg.classList.add(isError ? 'text-red-600' : 'text-green-700');
+            if (!isError) setTimeout(() => savedMsg.classList.add('hidden'), 2000);
+        }
+
+        async function loadRows() {
+            rows.innerHTML = '<p class="py-6 text-sm text-brand-accent">Loading current stock…</p>';
+            let stock;
+            try {
+                stock = await window.AltusInventory.getAll();
+            } catch (e) {
+                rows.innerHTML = '';
+                showMessage('Could not load stock — check your connection and reload.', true);
+                return;
+            }
+
+            rows.innerHTML = '';
+            Object.keys(PRODUCTS).forEach((id) => {
+                const product = PRODUCTS[id];
+                const qty = typeof stock[id] === 'number' ? stock[id] : 0;
+                const row = document.createElement('div');
+                row.className = 'flex items-center gap-4 py-5 border-b border-black/10';
+                row.innerHTML = `
+                    <div class="w-16 h-16 bg-brand-grey flex-shrink-0 overflow-hidden">
+                        <img src="${product.image}" alt="${product.name}" class="w-full h-full object-contain">
+                    </div>
+                    <p class="flex-1 font-medium">${product.name}</p>
+                    <input type="number" min="0" step="1" data-stock-input="${id}"
+                        value="${qty}"
+                        class="w-24 border border-black/20 px-3 py-2 text-sm text-right focus:outline-none focus:border-black transition">
+                `;
+                rows.appendChild(row);
             });
-            const msg = document.getElementById('saved-msg');
-            msg.classList.remove('hidden');
-            setTimeout(() => msg.classList.add('hidden'), 2000);
+        }
+        loadRows();
+
+        stockForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Saving…';
+            savedMsg.classList.add('hidden');
+
+            try {
+                const inputs = Array.from(document.querySelectorAll('[data-stock-input]'));
+                await Promise.all(inputs.map((input) =>
+                    window.AltusInventory.setStock(input.dataset.stockInput, input.value)
+                ));
+                showMessage('Saved ✓', false);
+            } catch (err) {
+                showMessage('Save failed — check your connection and try again.', true);
+            }
+
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Stock';
         });
 
         document.getElementById('logout-btn').addEventListener('click', function () {

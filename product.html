@@ -233,7 +233,7 @@
             }
         };
 
-        let state = { imgIndex: 0, qty: 1 };
+        let state = { imgIndex: 0, qty: 1, soldOut: false };
 
         function getIdFromUrl() {
             const params = new URLSearchParams(window.location.search);
@@ -294,17 +294,25 @@
             document.getElementById('qty-value').textContent = String(state.qty).padStart(2, '0');
 
             // Sold out: lock both CTA buttons and swap their labels.
-            const soldOut = window.AltusInventory.isSoldOut(id);
+            // state.soldOut is resolved once (async, from Supabase) before
+            // the first render — see DOMContentLoaded below.
             const addToCartBtn = document.getElementById('add-to-cart');
             const buyNowBtn = document.getElementById('buy-now');
-            addToCartBtn.disabled = soldOut;
-            buyNowBtn.disabled = soldOut;
-            addToCartBtn.textContent = soldOut ? 'Sold out' : 'Add to cart';
-            buyNowBtn.textContent = soldOut ? 'Sold out' : 'Buy it now';
+            addToCartBtn.disabled = state.soldOut;
+            buyNowBtn.disabled = state.soldOut;
+            addToCartBtn.textContent = state.soldOut ? 'Sold out' : 'Add to cart';
+            buyNowBtn.textContent = state.soldOut ? 'Sold out' : 'Buy it now';
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             render();
+
+            // Resolve sold-out status from Supabase without blocking the
+            // initial paint; re-render once it's known.
+            window.AltusInventory.isSoldOut(getIdFromUrl()).then((soldOut) => {
+                state.soldOut = soldOut;
+                render();
+            });
 
             document.getElementById('prev-arrow').addEventListener('click', () => {
                 const product = PRODUCTS[getIdFromUrl()];
@@ -329,7 +337,7 @@
             document.getElementById('add-to-cart').addEventListener('click', function () {
                 const btn = this;
                 const id = getIdFromUrl();
-                if (window.AltusInventory.isSoldOut(id)) return;
+                if (state.soldOut) return;
                 const original = btn.textContent;
                 const product = PRODUCTS[id];
                 window.AltusCart.addItem({
@@ -355,7 +363,7 @@
             document.getElementById('buy-now').addEventListener('click', async function () {
                 const btn = this;
                 const id = getIdFromUrl();
-                if (window.AltusInventory.isSoldOut(id)) return;
+                if (state.soldOut) return;
                 const original = btn.textContent;
                 const product = PRODUCTS[id];
 
