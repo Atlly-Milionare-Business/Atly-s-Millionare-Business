@@ -345,54 +345,23 @@
                 }, 1400);
             });
 
-            const CHECKOUT_ENDPOINT = 'https://jdwrivizhjtlbizyjmpl.supabase.co/functions/v1/create-checkout-session';
-            const SUPABASE_ANON_KEY = 'sb_publishable_J6ZVTn3A08l2H0jHUT4p2A_quON5Dv9';
-
-            document.getElementById('buy-now').addEventListener('click', async function () {
-                const btn = this;
+            // Buy it now adds the item to the cart and hands off to cart.html,
+            // where the shipping address is collected and shipping is priced —
+            // checkout always starts from one place so that step can't be skipped.
+            document.getElementById('buy-now').addEventListener('click', function () {
                 const id = getIdFromUrl();
                 if (state.soldOut) return;
-                const original = btn.textContent;
                 const product = PRODUCTS[id];
-
-                btn.disabled = true;
-                btn.textContent = 'Redirecting to checkout…';
-
-                try {
-                    const res = await fetch(CHECKOUT_ENDPOINT, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'apikey': SUPABASE_ANON_KEY,
-                            'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
-                        },
-                        body: JSON.stringify({
-                            items: [{
-                                id: id,
-                                qty: state.qty,
-                                color: product.colorName
-                            }],
-                            successUrl: window.location.origin + window.location.pathname.replace(/product\.html$/, '') + 'cart.html?checkout=success',
-                            cancelUrl: window.location.href
-                        })
-                    });
-
-                    const data = await res.json();
-
-                    if (res.ok && data.url) {
-                        window.location.href = data.url;
-                        return;
-                    }
-
-                    btn.textContent = data.error === 'not_configured' ? 'Checkout coming soon' : (data.message || 'Something went wrong');
-                } catch (err) {
-                    btn.textContent = 'Network error — try again';
-                }
-
-                setTimeout(() => {
-                    btn.textContent = original;
-                    btn.disabled = false;
-                }, 2200);
+                window.AltusCart.addItem({
+                    id: id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.images[0],
+                    color: product.colorName,
+                    size: null,
+                    qty: state.qty
+                });
+                window.location.href = 'cart.html';
             });
 
             // Image zoom lightbox
