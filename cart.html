@@ -97,7 +97,25 @@
         <div id="cart-contents" class="hidden">
             <div id="cart-items" class="border-t border-black/10"></div>
 
-            <div class="grid sm:grid-cols-2 gap-10 mt-8">
+            <!-- Step 1: cart summary — just what's in the cart -->
+            <div id="step-cart" class="flex justify-end mt-8">
+                <div class="w-full sm:w-80">
+                    <div class="flex justify-between text-sm text-brand-accent mb-2">
+                        <span>Subtotal</span>
+                        <span id="cart-subtotal">$0.00</span>
+                    </div>
+                    <p class="text-xs text-brand-accent mb-6">Free shipping on orders over $100. Shipping within Canada only. See our <a href="index.html#shipping" class="underline hover:text-brand-black transition">shipping policy</a>.</p>
+                    <button id="proceed-btn" class="checkout-btn w-full bg-black text-white py-3 text-sm tracking-widest uppercase font-medium hover:bg-brand-accent transition">
+                        Proceed to Checkout
+                    </button>
+                    <a href="products.html" class="block text-center text-sm text-brand-accent hover:text-brand-black transition mt-4">
+                        Continue Shopping
+                    </a>
+                </div>
+            </div>
+
+            <!-- Step 2: address, revealed only after "Proceed to Checkout" -->
+            <div id="step-address" class="hidden grid sm:grid-cols-2 gap-10 mt-8 border-t border-black/10 pt-8">
                 <div>
                     <h2 class="font-serif uppercase tracking-wide text-lg mb-1">Shipping Address</h2>
                     <p class="text-xs text-brand-accent mb-4">Canada only. Your postal code sets the shipping cost below — required before you can pay.</p>
@@ -125,12 +143,15 @@
                         </div>
                         <input id="ship-postal" type="text" placeholder="Postal code (e.g. V7J 3H2)" autocomplete="postal-code" class="w-full sm:w-1/2 border border-black/20 px-3 py-2 text-sm focus:outline-none focus:border-black">
                     </div>
+                    <button id="back-to-cart-btn" class="text-sm text-brand-accent hover:text-brand-black transition mt-4 underline">
+                        &larr; Back to cart
+                    </button>
                 </div>
 
                 <div class="w-full sm:w-80 sm:justify-self-end">
                     <div class="flex justify-between text-sm text-brand-accent mb-2">
                         <span>Subtotal</span>
-                        <span id="cart-subtotal">$0.00</span>
+                        <span id="cart-subtotal-2">$0.00</span>
                     </div>
                     <div class="flex justify-between text-sm text-brand-accent mb-2">
                         <span>Shipping</span>
@@ -144,9 +165,6 @@
                     <button id="checkout-btn" class="checkout-btn w-full bg-black text-white py-3 text-sm tracking-widest uppercase font-medium hover:bg-brand-accent transition disabled:opacity-50 disabled:cursor-not-allowed" disabled>
                         Enter address to continue
                     </button>
-                    <a href="products.html" class="block text-center text-sm text-brand-accent hover:text-brand-black transition mt-4">
-                        Continue Shopping
-                    </a>
                 </div>
             </div>
         </div>
@@ -167,6 +185,19 @@
             ['ship-name', 'ship-address', 'ship-city', 'ship-province', 'ship-postal'].forEach((id) => {
                 document.getElementById(id).addEventListener('input', updateTotals);
                 document.getElementById(id).addEventListener('change', updateTotals);
+            });
+
+            document.getElementById('proceed-btn').addEventListener('click', () => {
+                if (window.AltusCart.getItems().length === 0) return;
+                document.getElementById('step-cart').classList.add('hidden');
+                document.getElementById('step-address').classList.remove('hidden');
+                updateTotals();
+                document.getElementById('ship-name').focus();
+            });
+
+            document.getElementById('back-to-cart-btn').addEventListener('click', () => {
+                document.getElementById('step-address').classList.add('hidden');
+                document.getElementById('step-cart').classList.remove('hidden');
             });
         });
 
@@ -216,6 +247,7 @@
             const totalEl = document.getElementById('cart-total');
 
             document.getElementById('cart-subtotal').textContent = money(subtotal);
+            document.getElementById('cart-subtotal-2').textContent = money(subtotal);
 
             if (!complete) {
                 shippingEl.textContent = 'Enter address';
@@ -248,6 +280,8 @@
 
             emptyState.classList.add('hidden');
             cartContents.classList.remove('hidden');
+            document.getElementById('step-address').classList.add('hidden');
+            document.getElementById('step-cart').classList.remove('hidden');
 
             itemsContainer.innerHTML = '';
             items.forEach((item, index) => {
