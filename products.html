@@ -35,6 +35,18 @@
             text-decoration: underline;
             text-underline-offset: 6px;
         }
+
+        /* Fade-upward entrance, matching the home page's slide-in effect */
+        .slide-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 1.2s ease-out, transform 1s ease-out;
+            will-change: opacity, transform;
+        }
+        .slide-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body class="font-sans bg-brand-white text-brand-black">
@@ -76,7 +88,7 @@
         <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-12">
 
             <!-- Product 1 -->
-            <a href="product.html?id=1" class="product-card group block" data-product-id="1">
+            <a href="product.html?id=1" class="product-card group block slide-in" data-product-id="1">
                 <div class="relative bg-brand-grey aspect-square overflow-hidden">
                     <img src="./assets/bag-black.jpg" alt="Cross-Body Bag - Black" class="absolute inset-0 w-full h-full object-contain">
                     <span data-sold-out-badge class="hidden absolute top-2 left-2 bg-black text-white text-[10px] tracking-widest uppercase font-medium px-2 py-1">Sold Out</span>
@@ -88,7 +100,7 @@
             </a>
 
             <!-- Product 2 -->
-            <a href="product.html?id=2" class="product-card group block" data-product-id="2">
+            <a href="product.html?id=2" class="product-card group block slide-in" data-product-id="2" style="transition-delay: 0.1s;">
                 <div class="relative bg-brand-grey aspect-square overflow-hidden">
                     <img src="./assets/bag-grey.jpg" alt="Cross-Body Bag - Grey" class="absolute inset-0 w-full h-full object-contain">
                     <span data-sold-out-badge class="hidden absolute top-2 left-2 bg-black text-white text-[10px] tracking-widest uppercase font-medium px-2 py-1">Sold Out</span>
@@ -100,7 +112,7 @@
             </a>
 
             <!-- Product 3 -->
-            <a href="product.html?id=3" class="product-card group block" data-product-id="3">
+            <a href="product.html?id=3" class="product-card group block slide-in" data-product-id="3" style="transition-delay: 0.2s;">
                 <div class="relative bg-brand-grey aspect-square overflow-hidden">
                     <img src="./assets/bag-navy.jpg" alt="Cross-Body Bag - Navy" class="absolute inset-0 w-full h-full object-contain">
                     <span data-sold-out-badge class="hidden absolute top-2 left-2 bg-black text-white text-[10px] tracking-widest uppercase font-medium px-2 py-1">Sold Out</span>
@@ -132,6 +144,18 @@
                     }
                 });
             });
+
+            // Fade-upward entrance for the product cards, same as the home page.
+            const observer = new IntersectionObserver((entries, obs) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        obs.unobserve(entry.target);
+                    }
+                });
+            }, { root: null, rootMargin: '0px', threshold: 0.1 });
+
+            document.querySelectorAll('.slide-in').forEach((el) => observer.observe(el));
         });
     </script>
 </body>
