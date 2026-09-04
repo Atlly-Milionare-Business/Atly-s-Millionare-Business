@@ -93,6 +93,42 @@
             60% { transform: rotateX(12deg); opacity: 1; }
             100% { transform: rotateX(0deg); opacity: 1; }
         }
+
+        /* Diagonal-close hover: two slanted panels slide in from the
+           sides and meet in the middle, then text/border flip color. */
+        .diagonal-close {
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+            transition: color 0.15s ease 0.3s, border-color 0.15s ease 0.3s;
+        }
+        .diagonal-close::before,
+        .diagonal-close::after {
+            content: '';
+            position: absolute;
+            top: -15%;
+            height: 130%;
+            width: 60%;
+            background: var(--diag-fill, #000);
+            z-index: -1;
+            transition: transform 0.45s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+        .diagonal-close::before {
+            left: 0;
+            transform: translateX(-160%) skewX(-18deg);
+        }
+        .diagonal-close::after {
+            right: 0;
+            transform: translateX(160%) skewX(-18deg);
+        }
+        .diagonal-close:hover {
+            color: var(--diag-color, #fff);
+            border-color: var(--diag-color, #fff);
+        }
+        .diagonal-close:hover::before,
+        .diagonal-close:hover::after {
+            transform: translateX(0) skewX(-18deg);
+        }
     </style>
 </head>
 
@@ -170,7 +206,7 @@
                     <p class="text-lg font-light leading-relaxed mb-10 max-w-md slide-in" style="transition-delay: 0.2s;">
                         OUR FIRST DROP: A COMPACT CROSS-BODY BAG BUILT FOR EVERYDAY CARRY, AVAILABLE IN THREE COLOURS.
                     </p>
-                    <a href="products.html" data-video-preview="assets/product-preview.mp4" class="inline-block px-8 py-3 bg-brand-black text-brand-white text-sm tracking-widest font-medium uppercase border-2 border-brand-white hover:bg-brand-white hover:text-brand-black hover:border-brand-black max-w-max slide-in" style="transition-delay: 0.4s;">
+                    <a href="products.html" class="diagonal-close inline-block px-8 py-3 bg-brand-black text-brand-white text-sm tracking-widest font-medium uppercase border-2 border-brand-white max-w-max slide-in" style="transition-delay: 0.4s; --diag-fill: #ffffff; --diag-color: #000000;">
                         CUSTOMISE AND PURCHASE
                     </a>
                 </div>
@@ -398,6 +434,5 @@
             });
         });
     </script>
-    <script src="assets/video-preview.js?v=2"></script>
 </body>
 </html>

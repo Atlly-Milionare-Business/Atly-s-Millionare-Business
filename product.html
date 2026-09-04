@@ -38,7 +38,44 @@
             overflow: hidden;
             transition: max-height 0.3s ease;
         }
-        .add-to-cart-btn.added { background-color: #16a34a !important; border-color: #16a34a !important; }
+        .add-to-cart-btn.added { background-color: #16a34a !important; border-color: #16a34a !important; color: #fff !important; }
+        .add-to-cart-btn.added::before, .add-to-cart-btn.added::after { opacity: 0; }
+
+        /* Diagonal-close hover: two slanted panels slide in from the
+           sides and meet in the middle, then text/border flip color. */
+        .diagonal-close {
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+            transition: color 0.15s ease 0.3s, border-color 0.15s ease 0.3s;
+        }
+        .diagonal-close::before,
+        .diagonal-close::after {
+            content: '';
+            position: absolute;
+            top: -15%;
+            height: 130%;
+            width: 60%;
+            background: var(--diag-fill, #000);
+            z-index: -1;
+            transition: transform 0.45s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.2s ease;
+        }
+        .diagonal-close::before {
+            left: 0;
+            transform: translateX(-160%) skewX(-18deg);
+        }
+        .diagonal-close::after {
+            right: 0;
+            transform: translateX(160%) skewX(-18deg);
+        }
+        .diagonal-close:hover:not(:disabled) {
+            color: var(--diag-color, #fff);
+            border-color: var(--diag-color, #fff);
+        }
+        .diagonal-close:hover:not(:disabled)::before,
+        .diagonal-close:hover:not(:disabled)::after {
+            transform: translateX(0) skewX(-18deg);
+        }
         #add-to-cart:disabled, #buy-now:disabled {
             opacity: 0.5;
             cursor: not-allowed;
@@ -135,10 +172,10 @@
 
                 <!-- CTA buttons -->
                 <div class="flex gap-4 mb-8">
-                    <button id="add-to-cart" data-video-preview="assets/product-preview.mp4" class="add-to-cart-btn flex-1 border-2 border-black text-black py-3 text-sm tracking-widest uppercase font-medium hover:bg-black hover:text-white transition">
+                    <button id="add-to-cart" class="add-to-cart-btn diagonal-close flex-1 border-2 border-black text-black py-3 text-sm tracking-widest uppercase font-medium" style="--diag-fill: #000000; --diag-color: #ffffff;">
                         Add to cart
                     </button>
-                    <button id="buy-now" data-video-preview="assets/product-preview.mp4" class="flex-1 bg-black text-white py-3 text-sm tracking-widest uppercase font-medium hover:bg-brand-accent transition">
+                    <button id="buy-now" class="diagonal-close flex-1 bg-black text-white py-3 text-sm tracking-widest uppercase font-medium" style="--diag-fill: #8a8a8a; --diag-color: #ffffff;">
                         Buy it now
                     </button>
                 </div>
@@ -398,6 +435,5 @@
             });
         });
     </script>
-    <script src="assets/video-preview.js?v=2"></script>
 </body>
 </html>
