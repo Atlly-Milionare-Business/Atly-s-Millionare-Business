@@ -1,6 +1,6 @@
 (function () {
     var SESSION_KEY = 'altus_admin_session';
-    var VALID_USERNAME = 'atly';
+    var VALID_USERNAME = 'atlyliu2009@gmail.com';
     var VALID_PASSWORD = 'yelchington';
 
     function isAuthed() {

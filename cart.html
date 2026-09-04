@@ -97,19 +97,74 @@
         <div id="cart-contents" class="hidden">
             <div id="cart-items" class="border-t border-black/10"></div>
 
-            <div class="flex justify-end mt-8">
+            <!-- Step 1: cart summary — just what's in the cart -->
+            <div id="step-cart" class="flex justify-end mt-8">
                 <div class="w-full sm:w-80">
                     <div class="flex justify-between text-sm text-brand-accent mb-2">
                         <span>Subtotal</span>
                         <span id="cart-subtotal">$0.00</span>
                     </div>
                     <p class="text-xs text-brand-accent mb-6">Free shipping on orders over $100. Shipping within Canada only. See our <a href="index.html#shipping" class="underline hover:text-brand-black transition">shipping policy</a>.</p>
-                    <button id="checkout-btn" class="checkout-btn w-full bg-black text-white py-3 text-sm tracking-widest uppercase font-medium hover:bg-brand-accent transition">
+                    <button id="proceed-btn" class="checkout-btn w-full bg-black text-white py-3 text-sm tracking-widest uppercase font-medium hover:bg-brand-accent transition">
                         Proceed to Checkout
                     </button>
                     <a href="products.html" class="block text-center text-sm text-brand-accent hover:text-brand-black transition mt-4">
                         Continue Shopping
                     </a>
+                </div>
+            </div>
+
+            <!-- Step 2: address, revealed only after "Proceed to Checkout" -->
+            <div id="step-address" class="hidden grid sm:grid-cols-2 gap-10 mt-8 border-t border-black/10 pt-8">
+                <div>
+                    <h2 class="font-serif uppercase tracking-wide text-lg mb-1">Shipping Address</h2>
+                    <p class="text-xs text-brand-accent mb-4">Canada only. Your postal code sets the shipping cost below — required before you can pay.</p>
+                    <div class="space-y-3">
+                        <input id="ship-name" type="text" placeholder="Full name" autocomplete="name" class="w-full border border-black/20 px-3 py-2 text-sm focus:outline-none focus:border-black">
+                        <input id="ship-address" type="text" placeholder="Address" autocomplete="address-line1" class="w-full border border-black/20 px-3 py-2 text-sm focus:outline-none focus:border-black">
+                        <div class="grid grid-cols-2 gap-3">
+                            <input id="ship-city" type="text" placeholder="City" autocomplete="address-level2" class="w-full border border-black/20 px-3 py-2 text-sm focus:outline-none focus:border-black">
+                            <select id="ship-province" autocomplete="address-level1" class="w-full border border-black/20 px-3 py-2 text-sm focus:outline-none focus:border-black">
+                                <option value="">Province</option>
+                                <option value="BC">British Columbia</option>
+                                <option value="AB">Alberta</option>
+                                <option value="SK">Saskatchewan</option>
+                                <option value="MB">Manitoba</option>
+                                <option value="ON">Ontario</option>
+                                <option value="QC">Quebec</option>
+                                <option value="NB">New Brunswick</option>
+                                <option value="NS">Nova Scotia</option>
+                                <option value="PE">Prince Edward Island</option>
+                                <option value="NL">Newfoundland and Labrador</option>
+                                <option value="YT">Yukon</option>
+                                <option value="NT">Northwest Territories</option>
+                                <option value="NU">Nunavut</option>
+                            </select>
+                        </div>
+                        <input id="ship-postal" type="text" placeholder="Postal code (e.g. V7J 3H2)" autocomplete="postal-code" class="w-full sm:w-1/2 border border-black/20 px-3 py-2 text-sm focus:outline-none focus:border-black">
+                    </div>
+                    <button id="back-to-cart-btn" class="text-sm text-brand-accent hover:text-brand-black transition mt-4 underline">
+                        &larr; Back to cart
+                    </button>
+                </div>
+
+                <div class="w-full sm:w-80 sm:justify-self-end">
+                    <div class="flex justify-between text-sm text-brand-accent mb-2">
+                        <span>Subtotal</span>
+                        <span id="cart-subtotal-2">$0.00</span>
+                    </div>
+                    <div class="flex justify-between text-sm text-brand-accent mb-2">
+                        <span>Shipping</span>
+                        <span id="cart-shipping">Enter address</span>
+                    </div>
+                    <div class="flex justify-between text-sm font-medium border-t border-black/10 mt-3 pt-3 mb-2">
+                        <span>Total</span>
+                        <span id="cart-total">$0.00</span>
+                    </div>
+                    <p class="text-xs text-brand-accent mb-6">Free shipping on orders over $100. Shipping is calculated from Canada Post rates plus 10%, within Canada only. See our <a href="index.html#shipping" class="underline hover:text-brand-black transition">shipping policy</a>.</p>
+                    <button id="checkout-btn" class="checkout-btn w-full bg-black text-white py-3 text-sm tracking-widest uppercase font-medium hover:bg-brand-accent transition disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        Enter address to continue
+                    </button>
                 </div>
             </div>
         </div>
@@ -126,10 +181,89 @@
             });
 
             renderCart();
+
+            ['ship-name', 'ship-address', 'ship-city', 'ship-province', 'ship-postal'].forEach((id) => {
+                document.getElementById(id).addEventListener('input', updateTotals);
+                document.getElementById(id).addEventListener('change', updateTotals);
+            });
+
+            document.getElementById('proceed-btn').addEventListener('click', () => {
+                if (window.AltusCart.getItems().length === 0) return;
+                document.getElementById('step-cart').classList.add('hidden');
+                document.getElementById('step-address').classList.remove('hidden');
+                updateTotals();
+                document.getElementById('ship-name').focus();
+            });
+
+            document.getElementById('back-to-cart-btn').addEventListener('click', () => {
+                document.getElementById('step-address').classList.add('hidden');
+                document.getElementById('step-cart').classList.remove('hidden');
+            });
         });
 
         function money(n) {
             return '$' + n.toFixed(2);
+        }
+
+        // Flat-rate shipping zones approximated from Canada Post's published
+        // Regular Parcel rates ex Lynn Valley (V7J 3H2), 0.16kg/32x13x3cm, +10%.
+        // Mirrored (and re-verified) server-side in create-checkout-session —
+        // this copy is just for showing the customer a live estimate.
+        const CA_POSTAL_RE = /^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$/;
+
+        function getShippingZoneCents(postalCode) {
+            const fsa = String(postalCode || '').trim().toUpperCase().replace(/\s/g, '').slice(0, 3);
+            if (fsa.slice(0, 2) === 'V5' || fsa.slice(0, 2) === 'V6' || fsa.slice(0, 2) === 'V7') {
+                return { cents: 1828, label: 'Metro Vancouver' };
+            }
+            if (fsa.startsWith('V')) {
+                return { cents: 2462, label: 'Rest of BC' };
+            }
+            return { cents: 3134, label: 'Rest of Canada' };
+        }
+
+        function getShippingAddress() {
+            return {
+                name: document.getElementById('ship-name').value.trim(),
+                line1: document.getElementById('ship-address').value.trim(),
+                city: document.getElementById('ship-city').value.trim(),
+                province: document.getElementById('ship-province').value,
+                postalCode: document.getElementById('ship-postal').value.trim().toUpperCase(),
+                country: 'CA'
+            };
+        }
+
+        function isAddressComplete(addr) {
+            return !!(addr.name && addr.line1 && addr.city && addr.province && CA_POSTAL_RE.test(addr.postalCode));
+        }
+
+        function updateTotals() {
+            const subtotal = window.AltusCart.getSubtotal();
+            const items = window.AltusCart.getItems();
+            const addr = getShippingAddress();
+            const complete = isAddressComplete(addr);
+            const checkoutBtn = document.getElementById('checkout-btn');
+            const shippingEl = document.getElementById('cart-shipping');
+            const totalEl = document.getElementById('cart-total');
+
+            document.getElementById('cart-subtotal').textContent = money(subtotal);
+            document.getElementById('cart-subtotal-2').textContent = money(subtotal);
+
+            if (!complete) {
+                shippingEl.textContent = 'Enter address';
+                totalEl.textContent = money(subtotal);
+                checkoutBtn.disabled = true;
+                checkoutBtn.textContent = 'Enter address to continue';
+                return;
+            }
+
+            const freeShipping = subtotal >= 100;
+            const zone = getShippingZoneCents(addr.postalCode);
+            const shippingCents = freeShipping ? 0 : zone.cents;
+            shippingEl.textContent = freeShipping ? 'Free' : (money(shippingCents / 100) + ' (' + zone.label + ')');
+            totalEl.textContent = money(subtotal + shippingCents / 100);
+            checkoutBtn.disabled = items.length === 0;
+            checkoutBtn.textContent = 'Proceed to Checkout';
         }
 
         function renderCart() {
@@ -146,6 +280,8 @@
 
             emptyState.classList.add('hidden');
             cartContents.classList.remove('hidden');
+            document.getElementById('step-address').classList.add('hidden');
+            document.getElementById('step-cart').classList.remove('hidden');
 
             itemsContainer.innerHTML = '';
             items.forEach((item, index) => {
@@ -176,7 +312,7 @@
                 itemsContainer.appendChild(row);
             });
 
-            document.getElementById('cart-subtotal').textContent = money(window.AltusCart.getSubtotal());
+            updateTotals();
 
             itemsContainer.querySelectorAll('.qty-minus').forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -213,8 +349,9 @@
             const btn = this;
             const original = btn.textContent;
             const items = window.AltusCart.getItems();
+            const destination = getShippingAddress();
 
-            if (items.length === 0) return;
+            if (items.length === 0 || !isAddressComplete(destination)) return;
 
             btn.disabled = true;
             btn.textContent = 'Redirecting to checkout…';
@@ -229,6 +366,7 @@
                     },
                     body: JSON.stringify({
                         items: items.map(i => ({ id: i.id, qty: i.qty, color: i.color, size: i.size })),
+                        destination: destination,
                         successUrl: window.location.origin + window.location.pathname.replace(/cart\.html$/, '') + 'cart.html?checkout=success',
                         cancelUrl: window.location.href
                     })

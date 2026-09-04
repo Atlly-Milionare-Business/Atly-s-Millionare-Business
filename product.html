@@ -149,11 +149,11 @@
                 <div class="border-t border-black/10">
                     <div class="accordion-item border-b border-black/10">
                         <button class="accordion-toggle w-full flex justify-between items-center py-4 text-left">
-                            <span class="font-serif uppercase tracking-wide">Details</span>
+                            <span class="font-serif uppercase tracking-wide">Description</span>
                             <svg class="accordion-chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </button>
                         <div class="accordion-panel">
-                            <p class="text-sm text-brand-accent leading-relaxed pb-4">Compact cross-body bag with an adjustable strap and a diagonal zip pocket. Water-resistant shell, lightweight enough for everyday carry.<br>Dimensions: 32cm (L) &times; 13cm (H) &times; 3cm (D).</p>
+                            <p id="product-description" class="text-sm text-brand-accent leading-relaxed pb-4"></p>
                         </div>
                     </div>
                     <div class="accordion-item border-b border-black/10">
@@ -167,11 +167,11 @@
                     </div>
                     <div class="accordion-item border-b border-black/10">
                         <button class="accordion-toggle w-full flex justify-between items-center py-4 text-left">
-                            <span class="font-serif uppercase tracking-wide">Description</span>
+                            <span class="font-serif uppercase tracking-wide">Details</span>
                             <svg class="accordion-chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </button>
                         <div class="accordion-panel">
-                            <p id="product-description" class="text-sm text-brand-accent leading-relaxed pb-4"></p>
+                            <p class="text-sm text-brand-accent leading-relaxed pb-4">Weight: 0.35 lb (0.16 kg)<br>Material: Nylon<br>Certification: ISO 14001<br>Dimensions: 32cm (L) &times; 13cm (H) &times; 3cm (D)</p>
                         </div>
                     </div>
                 </div>
@@ -201,21 +201,21 @@
         const PRODUCTS = {
             1: {
                 name: 'Cross-Body Bag — Black',
-                price: 20,
+                price: 30,
                 blurb: 'Compact cross-body bag, built for everyday carry.',
                 images: ['./assets/bag-black.jpg', './assets/bag-black-front.jpg', './assets/bag-black-angle2.jpg', './assets/bag-black-dimensions.jpg'],
                 colorName: 'Black'
             },
             2: {
                 name: 'Cross-Body Bag — Grey',
-                price: 20,
+                price: 30,
                 blurb: 'Compact cross-body bag, built for everyday carry.',
                 images: ['./assets/bag-grey.jpg'],
                 colorName: 'Grey'
             },
             3: {
                 name: 'Cross-Body Bag — Navy',
-                price: 20,
+                price: 30,
                 blurb: 'Compact cross-body bag, built for everyday carry.',
                 images: ['./assets/bag-navy.jpg'],
                 colorName: 'Navy'
@@ -240,7 +240,7 @@
             document.getElementById('color-label').textContent = product.colorName;
             document.getElementById('product-blurb').textContent = product.blurb;
             document.getElementById('product-description').textContent =
-                product.blurb + ' Designed and tested in North Vancouver.';
+                'Equally at home on an outdoor excursion or a casual day out, this cross-body bag features a fully adjustable strap for a fit you can dial in, secured by a squeeze-release buckle for quick on-and-off wear. Its waterproof build keeps your essentials protected against rain, sweat, or splashes, so you can move from an active outing to everyday errands without missing a beat.';
 
             // Gallery: only show thumbnails/arrows if there's more than one photo
             const rail = document.getElementById('thumb-rail');
@@ -345,54 +345,23 @@
                 }, 1400);
             });
 
-            const CHECKOUT_ENDPOINT = 'https://jdwrivizhjtlbizyjmpl.supabase.co/functions/v1/create-checkout-session';
-            const SUPABASE_ANON_KEY = 'sb_publishable_J6ZVTn3A08l2H0jHUT4p2A_quON5Dv9';
-
-            document.getElementById('buy-now').addEventListener('click', async function () {
-                const btn = this;
+            // Buy it now adds the item to the cart and hands off to cart.html,
+            // where the shipping address is collected and shipping is priced —
+            // checkout always starts from one place so that step can't be skipped.
+            document.getElementById('buy-now').addEventListener('click', function () {
                 const id = getIdFromUrl();
                 if (state.soldOut) return;
-                const original = btn.textContent;
                 const product = PRODUCTS[id];
-
-                btn.disabled = true;
-                btn.textContent = 'Redirecting to checkout…';
-
-                try {
-                    const res = await fetch(CHECKOUT_ENDPOINT, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'apikey': SUPABASE_ANON_KEY,
-                            'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
-                        },
-                        body: JSON.stringify({
-                            items: [{
-                                id: id,
-                                qty: state.qty,
-                                color: product.colorName
-                            }],
-                            successUrl: window.location.origin + window.location.pathname.replace(/product\.html$/, '') + 'cart.html?checkout=success',
-                            cancelUrl: window.location.href
-                        })
-                    });
-
-                    const data = await res.json();
-
-                    if (res.ok && data.url) {
-                        window.location.href = data.url;
-                        return;
-                    }
-
-                    btn.textContent = data.error === 'not_configured' ? 'Checkout coming soon' : (data.message || 'Something went wrong');
-                } catch (err) {
-                    btn.textContent = 'Network error — try again';
-                }
-
-                setTimeout(() => {
-                    btn.textContent = original;
-                    btn.disabled = false;
-                }, 2200);
+                window.AltusCart.addItem({
+                    id: id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.images[0],
+                    color: product.colorName,
+                    size: null,
+                    qty: state.qty
+                });
+                window.location.href = 'cart.html';
             });
 
             // Image zoom lightbox
