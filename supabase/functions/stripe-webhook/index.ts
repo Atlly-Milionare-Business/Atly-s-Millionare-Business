@@ -61,15 +61,22 @@ async function sendOrderNotification(items: Array<{ name: string | null; qty: nu
 
     const lineItems = await stripe.checkout.sessions.listLineItems(session.id, { limit: 100 });
 
-    // Stripe has shipped the shipping-address field around between API
-    // versions (`shipping`, then `shipping_details`, then
-    // `collected_information.shipping_details`) — check all of them so
-    // this keeps working regardless of which one this Stripe account is on.
-    const shipping =
-      (session as any).shipping_details ??
-      (session as any).collected_information?.shipping_details ??
-      (session as any).shipping ??
-      null;
+    // The shipping address is collected on our own cart page (not by
+    // Stripe's Checkout UI), so create-checkout-session passes it through
+    // as session metadata instead of Stripe's shipping_details field.
+    const metadata = session.metadata ?? {};
+    const shipping = metadata.shipping_line1
+      ? {
+          name: metadata.shipping_name ?? null,
+          address: {
+            line1: metadata.shipping_line1 ?? null,
+            city: metadata.shipping_city ?? null,
+            state: metadata.shipping_province ?? null,
+            postal_code: metadata.shipping_postal_code ?? null,
+            country: metadata.shipping_country ?? null,
+          },
+        }
+      : null;
 
     const { error } = await supabase.from("orders").insert({
       stripe_session_id: session.id,
