@@ -47,6 +47,16 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* Subtle 3D tilt + float on product image hover */
+        .tilt-wrap {
+            transform: perspective(900px) rotateX(0deg) rotateY(0deg) translateY(0) scale(1);
+            transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: transform;
+        }
+        .tilt-wrap.tilting {
+            box-shadow: 0 24px 40px -20px rgba(0, 0, 0, 0.35);
+        }
     </style>
 </head>
 <body class="font-sans bg-brand-white text-brand-black">
@@ -89,7 +99,7 @@
 
             <!-- Product 1 -->
             <a href="product.html?id=1" class="product-card group block slide-in" data-product-id="1">
-                <div class="relative bg-brand-grey aspect-square overflow-hidden">
+                <div class="tilt-wrap relative bg-brand-grey aspect-square overflow-hidden">
                     <img src="./assets/bag-black.jpg" alt="Cross-Body Bag - Black" class="absolute inset-0 w-full h-full object-contain">
                     <span data-sold-out-badge class="hidden absolute top-2 left-2 bg-black text-white text-[10px] tracking-widest uppercase font-medium px-2 py-1">Sold Out</span>
                 </div>
@@ -101,7 +111,7 @@
 
             <!-- Product 2 -->
             <a href="product.html?id=2" class="product-card group block slide-in" data-product-id="2" style="transition-delay: 0.1s;">
-                <div class="relative bg-brand-grey aspect-square overflow-hidden">
+                <div class="tilt-wrap relative bg-brand-grey aspect-square overflow-hidden">
                     <img src="./assets/bag-grey.jpg" alt="Cross-Body Bag - Grey" class="absolute inset-0 w-full h-full object-contain">
                     <span data-sold-out-badge class="hidden absolute top-2 left-2 bg-black text-white text-[10px] tracking-widest uppercase font-medium px-2 py-1">Sold Out</span>
                 </div>
@@ -113,7 +123,7 @@
 
             <!-- Product 3 -->
             <a href="product.html?id=3" class="product-card group block slide-in" data-product-id="3" style="transition-delay: 0.2s;">
-                <div class="relative bg-brand-grey aspect-square overflow-hidden">
+                <div class="tilt-wrap relative bg-brand-grey aspect-square overflow-hidden">
                     <img src="./assets/bag-navy.jpg" alt="Cross-Body Bag - Navy" class="absolute inset-0 w-full h-full object-contain">
                     <span data-sold-out-badge class="hidden absolute top-2 left-2 bg-black text-white text-[10px] tracking-widest uppercase font-medium px-2 py-1">Sold Out</span>
                 </div>
@@ -156,6 +166,24 @@
             }, { root: null, rootMargin: '0px', threshold: 0.1 });
 
             document.querySelectorAll('.slide-in').forEach((el) => observer.observe(el));
+
+            // Subtle 3D tilt on product image hover, following the cursor.
+            const MAX_TILT_DEG = 6;
+            document.querySelectorAll('.tilt-wrap').forEach((el) => {
+                el.addEventListener('mousemove', (e) => {
+                    const rect = el.getBoundingClientRect();
+                    const x = (e.clientX - rect.left) / rect.width;
+                    const y = (e.clientY - rect.top) / rect.height;
+                    const rotateY = (x - 0.5) * MAX_TILT_DEG;
+                    const rotateX = (0.5 - y) * MAX_TILT_DEG;
+                    el.style.transform = `perspective(900px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px) scale(1.03)`;
+                });
+                el.addEventListener('mouseenter', () => el.classList.add('tilting'));
+                el.addEventListener('mouseleave', () => {
+                    el.classList.remove('tilting');
+                    el.style.transform = '';
+                });
+            });
         });
     </script>
 </body>
