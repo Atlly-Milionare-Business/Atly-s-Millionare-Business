@@ -54,6 +54,19 @@
             background-color: rgba(0, 0, 0, 0.4); /* Dark overlay for better contrast */
         }
 
+        /* Extra darkening behind the hero logo/title/tagline, on top of
+           .image-overlay — a plain flat overlay wasn't reliably dark
+           enough where the busy parts of bg-1.jpg sit behind the text. */
+        .hero-vignette {
+            background: radial-gradient(ellipse at 50% 45%, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.35) 55%, rgba(0, 0, 0, 0.15) 100%);
+        }
+        .hero-text-shadow {
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6), 0 1px 4px rgba(0, 0, 0, 0.55);
+        }
+        .hero-logo-shadow {
+            filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.6));
+        }
+
         /* Nav gains a solid backing once the user scrolls past the hero */
         #site-nav {
             background-color: rgba(0, 0, 0, 0);
@@ -175,11 +188,12 @@
         </div>
 
         <div class="image-overlay absolute inset-0"></div>
+        <div class="hero-vignette absolute inset-0"></div>
 
-        <div class="relative z-10 text-center max-w-4xl px-4 slide-in">
+        <div class="hero-text-shadow relative z-10 text-center max-w-4xl px-4 slide-in">
             <!-- Center Logo -->
             <div class="mx-auto mb-8 w-40 h-40 sm:w-56 sm:h-56">
-                 <img src="./assets/logo-mark.png" alt="Altus Gear Center Logo" class="w-full h-full object-contain">
+                 <img src="./assets/logo-mark.png" alt="Altus Gear Center Logo" class="hero-logo-shadow w-full h-full object-contain">
             </div>
 
             <h1 class="text-6xl sm:text-7xl lg:text-8xl uppercase tracking-widest mb-2 slide-in" style="transition-delay: 0.1s;">ALTUS GEAR</h1>
