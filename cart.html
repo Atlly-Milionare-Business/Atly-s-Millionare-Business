@@ -9,7 +9,7 @@
     <link rel="icon" href="./assets/favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -22,7 +22,7 @@
                         'brand-accent': '#8a8a8a',
                     },
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
+                        sans: ['Poppins', 'sans-serif'],
                         serif: ['Georgia', 'serif'],
                     }
                 }
@@ -39,7 +39,7 @@
         .checkout-btn.clicked { background-color: #16a34a !important; }
     </style>
 </head>
-<body class="font-sans bg-brand-white text-brand-black">
+<body class="font-sans font-light bg-brand-white text-brand-black">
 
     <!-- Top Nav -->
     <nav class="sticky top-0 z-50 bg-brand-white border-b border-black/10">
@@ -207,7 +207,8 @@
 
         // Flat-rate shipping zones approximated from Canada Post's published
         // Regular Parcel rates ex Lynn Valley (V7J 3H2), 0.16kg/32x13x3cm, +10%,
-        // then a 5% storewide discount applied 2026-09-07.
+        // a 5% storewide discount applied 2026-09-07, and a further $2
+        // reduction applied 2026-09-09.
         // Mirrored (and re-verified) server-side in create-checkout-session —
         // this copy is just for showing the customer a live estimate.
         const CA_POSTAL_RE = /^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$/;
@@ -215,12 +216,12 @@
         function getShippingZoneCents(postalCode) {
             const fsa = String(postalCode || '').trim().toUpperCase().replace(/\s/g, '').slice(0, 3);
             if (fsa.slice(0, 2) === 'V5' || fsa.slice(0, 2) === 'V6' || fsa.slice(0, 2) === 'V7') {
-                return { cents: 1737, label: 'Metro Vancouver' };
+                return { cents: 1537, label: 'Metro Vancouver' };
             }
             if (fsa.startsWith('V')) {
-                return { cents: 2339, label: 'Rest of BC' };
+                return { cents: 2139, label: 'Rest of BC' };
             }
-            return { cents: 2977, label: 'Rest of Canada' };
+            return { cents: 2777, label: 'Rest of Canada' };
         }
 
         function getShippingAddress() {

@@ -8,26 +8,27 @@ const STRIPE_SECRET_KEY = Deno.env.get("STRIPE_SECRET_KEY");
 const SITE_ORIGIN = "https://atlly-milionare-business.github.io/Atly-s-Millionare-Business";
 
 const PRODUCTS: Record<string, { name: string; price: number; image: string }> = {
-  "1": { name: "Cross-Body Bag — Black", price: 3000, image: `${SITE_ORIGIN}/assets/bag-black.jpg` },
-  "2": { name: "Cross-Body Bag — Grey", price: 3000, image: `${SITE_ORIGIN}/assets/bag-grey.jpg` },
-  "3": { name: "Cross-Body Bag — Navy", price: 3000, image: `${SITE_ORIGIN}/assets/bag-navy.jpg` },
+  "1": { name: "Cross-Body Bag — Black", price: 2500, image: `${SITE_ORIGIN}/assets/bag-black.jpg` },
+  "2": { name: "Cross-Body Bag — Grey", price: 2500, image: `${SITE_ORIGIN}/assets/bag-grey.jpg` },
+  "3": { name: "Cross-Body Bag — Navy", price: 2500, image: `${SITE_ORIGIN}/assets/bag-navy.jpg` },
 };
 
 // Flat-rate shipping zones approximated from Canada Post's published
 // Regular Parcel rates ex Lynn Valley (V7J 3H2), 0.16kg/32x13x3cm box,
-// plus a 10% margin, then a 5% storewide discount applied 2026-09-07.
+// plus a 10% margin, a 5% storewide discount applied 2026-09-07, and a
+// further $2 reduction applied 2026-09-09.
 // Not a live carrier-calculated rate — see project notes for upgrading
 // to the Canada Post Rating API later.
 function getShippingForPostalCode(postalCode: string): { amountCents: number; label: string } {
   const fsa = String(postalCode || "").toUpperCase().replace(/\s/g, "").slice(0, 3);
   const fsa2 = fsa.slice(0, 2);
   if (fsa2 === "V5" || fsa2 === "V6" || fsa2 === "V7") {
-    return { amountCents: 1737, label: "Standard Shipping — Metro Vancouver (Canada Post)" };
+    return { amountCents: 1537, label: "Standard Shipping — Metro Vancouver (Canada Post)" };
     }
     if (fsa.startsWith("V")) {
-      return { amountCents: 2339, label: "Standard Shipping — BC (Canada Post)" };
+      return { amountCents: 2139, label: "Standard Shipping — BC (Canada Post)" };
       }
-      return { amountCents: 2977, label: "Standard Shipping — Canada (Canada Post)" };
+      return { amountCents: 2777, label: "Standard Shipping — Canada (Canada Post)" };
       }
       const FREE_SHIPPING_THRESHOLD_CENTS = 10000; // $100.00 CAD
       const SHIPPING_CURRENCY = "cad";
