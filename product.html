@@ -166,8 +166,9 @@
                     <div class="inline-flex items-center border border-black/20">
                         <button id="qty-minus" class="w-10 h-10 flex items-center justify-center hover:bg-brand-grey transition">&minus;</button>
                         <span id="qty-value" class="w-10 text-center text-sm">1</span>
-                        <button id="qty-plus" class="w-10 h-10 flex items-center justify-center hover:bg-brand-grey transition">+</button>
+                        <button id="qty-plus" class="w-10 h-10 flex items-center justify-center hover:bg-brand-grey transition disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent">+</button>
                     </div>
+                    <p id="qty-stock-msg" class="text-xs text-brand-accent mt-2 h-4"></p>
                 </div>
 
                 <!-- CTA buttons -->
@@ -259,7 +260,7 @@
             }
         };
 
-        let state = { imgIndex: 0, qty: 1, soldOut: false };
+        let state = { imgIndex: 0, qty: 1, soldOut: false, stockQty: null };
 
         function getIdFromUrl() {
             const params = new URLSearchParams(window.location.search);
@@ -318,9 +319,16 @@
 
             document.getElementById('qty-value').textContent = String(state.qty);
 
+            // Cap the quantity selector at whatever's actually left in
+            // stock. state.stockQty is resolved once (async, from Supabase)
+            // before the first render — see DOMContentLoaded below.
+            const qtyPlusBtn = document.getElementById('qty-plus');
+            const qtyStockMsg = document.getElementById('qty-stock-msg');
+            const atStockLimit = typeof state.stockQty === 'number' && state.qty >= state.stockQty;
+            qtyPlusBtn.disabled = atStockLimit;
+            qtyStockMsg.textContent = atStockLimit ? `Only ${state.stockQty} in stock` : '';
+
             // Sold out: lock both CTA buttons and swap their labels.
-            // state.soldOut is resolved once (async, from Supabase) before
-            // the first render — see DOMContentLoaded below.
             const addToCartBtn = document.getElementById('add-to-cart');
             const buyNowBtn = document.getElementById('buy-now');
             addToCartBtn.disabled = state.soldOut;
@@ -332,10 +340,13 @@
         document.addEventListener('DOMContentLoaded', () => {
             render();
 
-            // Resolve sold-out status from Supabase without blocking the
-            // initial paint; re-render once it's known.
-            window.AltusInventory.isSoldOut(getIdFromUrl()).then((soldOut) => {
-                state.soldOut = soldOut;
+            // Resolve current stock from Supabase without blocking the
+            // initial paint; re-render once it's known. Also clamps qty
+            // down if it's already sitting above what's actually in stock.
+            window.AltusInventory.getStock(getIdFromUrl()).then((stockQty) => {
+                state.stockQty = stockQty;
+                state.soldOut = stockQty <= 0;
+                if (stockQty > 0) state.qty = Math.min(state.qty, stockQty);
                 render();
             });
 
@@ -355,6 +366,7 @@
                 render();
             });
             document.getElementById('qty-plus').addEventListener('click', () => {
+                if (typeof state.stockQty === 'number' && state.qty >= state.stockQty) return;
                 state.qty = state.qty + 1;
                 render();
             });

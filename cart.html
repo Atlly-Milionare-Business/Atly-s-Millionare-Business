@@ -172,6 +172,7 @@
 
     <script src="./assets/cart.js"></script>
     <script src="./assets/auth.js"></script>
+    <script src="./assets/inventory.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Mark current nav link (Products stays visually closest match; no dedicated Cart link style needed)
@@ -181,6 +182,14 @@
             });
 
             renderCart();
+
+            // Cap cart quantity steppers at whatever's actually in stock.
+            // stockMap starts empty (no cap yet) and fills in once the
+            // Supabase read resolves, then re-renders with real limits.
+            window.AltusInventory.getAll().then((stock) => {
+                stockMap = stock;
+                renderCart();
+            });
 
             ['ship-name', 'ship-address', 'ship-city', 'ship-province', 'ship-postal'].forEach((id) => {
                 document.getElementById(id).addEventListener('input', updateTotals);
@@ -204,6 +213,11 @@
         function money(n) {
             return '$' + n.toFixed(2);
         }
+
+        // Populated once from Supabase (see DOMContentLoaded above); maps
+        // product id -> quantity actually in stock, used to cap the +
+        // steppers below so a customer can't add more than exists.
+        let stockMap = {};
 
         // Flat-rate shipping zones approximated from Canada Post's published
         // Regular Parcel rates ex Lynn Valley (V7J 3H2), 0.16kg/32x13x3cm, +10%,
@@ -287,6 +301,8 @@
 
             itemsContainer.innerHTML = '';
             items.forEach((item, index) => {
+                const maxQty = typeof stockMap[item.id] === 'number' ? stockMap[item.id] : Infinity;
+                const atStockLimit = item.qty >= maxQty;
                 const row = document.createElement('div');
                 row.className = 'flex items-center gap-4 sm:gap-6 py-6 border-b border-black/10';
                 row.innerHTML = `
@@ -297,11 +313,12 @@
                         <p class="font-medium truncate">${item.name}</p>
                         <p class="text-xs text-brand-accent mt-1">${[item.color, item.size].filter(Boolean).join(' &middot; Size ')}</p>
                         <p class="text-sm mt-1">${money(item.price)}</p>
+                        ${atStockLimit ? `<p class="text-xs text-red-600 mt-1">Only ${maxQty} in stock</p>` : ''}
                     </div>
                     <div class="flex items-center border border-black/20 flex-shrink-0">
                         <button class="qty-btn qty-minus hover:bg-brand-grey transition" data-index="${index}">&minus;</button>
                         <span class="w-8 text-center text-sm">${item.qty}</span>
-                        <button class="qty-btn qty-plus hover:bg-brand-grey transition" data-index="${index}">+</button>
+                        <button class="qty-btn qty-plus hover:bg-brand-grey transition disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent" data-index="${index}" ${atStockLimit ? 'disabled' : ''}>+</button>
                     </div>
                     <p class="w-20 text-right font-medium flex-shrink-0">${money(item.price * item.qty)}</p>
                     <button class="remove-item text-brand-accent hover:text-brand-black transition flex-shrink-0" data-index="${index}" aria-label="Remove item">
@@ -328,6 +345,8 @@
                 btn.addEventListener('click', () => {
                     const i = parseInt(btn.dataset.index, 10);
                     const items = window.AltusCart.getItems();
+                    const maxQty = typeof stockMap[items[i].id] === 'number' ? stockMap[items[i].id] : Infinity;
+                    if (items[i].qty >= maxQty) return;
                     window.AltusCart.updateQty(i, items[i].qty + 1);
                     renderCart();
                 });
