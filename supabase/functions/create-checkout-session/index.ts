@@ -94,6 +94,11 @@ Deno.serve(async (req: Request) => {
 
     let lineCount = 0;
     let subtotalCents = 0;
+    // Product ids + quantities, passed through as metadata below so
+    // stripe-webhook knows exactly what to decrement from the stock table
+    // once payment actually succeeds (Stripe holds no concept of our
+    // internal product ids on its own).
+    const orderItemsForMetadata: Array<{ id: string; qty: number }> = [];
     for (const item of items as Array<{ id: string; qty: number; color?: string; size?: string }>) {
       const product = PRODUCTS[String(item.id)];
       if (!product) continue;
@@ -101,6 +106,7 @@ Deno.serve(async (req: Request) => {
       const variant = [item.color, item.size].filter(Boolean).join(" / ");
       const i = lineCount++;
       subtotalCents += product.price * qty;
+      orderItemsForMetadata.push({ id: String(item.id), qty });
 
       params.set(`line_items[${i}][price_data][currency]`, "cad");
       params.set(`line_items[${i}][price_data][unit_amount]`, String(product.price));
@@ -112,6 +118,8 @@ Deno.serve(async (req: Request) => {
     if (lineCount === 0) {
       return json({ error: "empty_cart", message: "No valid items in cart." }, 400);
     }
+
+    params.set("metadata[order_items]", JSON.stringify(orderItemsForMetadata));
 
 const qualifiesForFreeShipping = subtotalCents >= FREE_SHIPPING_THRESHOLD_CENTS;
 const shippingRate = getShippingForPostalCode(postalCode);
