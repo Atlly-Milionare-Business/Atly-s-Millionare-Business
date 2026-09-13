@@ -13,22 +13,24 @@ const PRODUCTS: Record<string, { name: string; price: number; image: string }> =
   "3": { name: "Cross-Body Bag — Navy", price: 2500, image: `${SITE_ORIGIN}/assets/bag-navy.jpg` },
 };
 
-// Flat-rate shipping zones approximated from Canada Post's published
-// Regular Parcel rates ex Lynn Valley (V7J 3H2), 0.16kg/32x13x3cm box,
-// plus a 10% margin, a 5% storewide discount applied 2026-09-07, and a
-// further $2 reduction applied 2026-09-09.
+// Flat-rate shipping zones. Originally approximated from Canada Post's
+// published Regular Parcel rates ex Lynn Valley (V7J 3H2), 0.16kg/32x13x3cm
+// box, plus a 10% margin; a 5% storewide discount applied 2026-09-07 and a
+// $2 reduction applied 2026-09-09. Rebased 2026-09-13 to bring Metro
+// Vancouver down to ~$10, with BC/Canada scaled by the same ratio they
+// held to Metro Vancouver before this rebase.
 // Not a live carrier-calculated rate — see project notes for upgrading
 // to the Canada Post Rating API later.
 function getShippingForPostalCode(postalCode: string): { amountCents: number; label: string } {
   const fsa = String(postalCode || "").toUpperCase().replace(/\s/g, "").slice(0, 3);
   const fsa2 = fsa.slice(0, 2);
   if (fsa2 === "V5" || fsa2 === "V6" || fsa2 === "V7") {
-    return { amountCents: 1537, label: "Standard Shipping — Metro Vancouver (Canada Post)" };
+    return { amountCents: 1000, label: "Standard Shipping — Metro Vancouver (Canada Post)" };
     }
     if (fsa.startsWith("V")) {
-      return { amountCents: 2139, label: "Standard Shipping — BC (Canada Post)" };
+      return { amountCents: 1392, label: "Standard Shipping — BC (Canada Post)" };
       }
-      return { amountCents: 2777, label: "Standard Shipping — Canada (Canada Post)" };
+      return { amountCents: 1807, label: "Standard Shipping — Canada (Canada Post)" };
       }
       const FREE_SHIPPING_THRESHOLD_CENTS = 10000; // $100.00 CAD
       const SHIPPING_CURRENCY = "cad";

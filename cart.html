@@ -219,10 +219,12 @@
         // steppers below so a customer can't add more than exists.
         let stockMap = {};
 
-        // Flat-rate shipping zones approximated from Canada Post's published
-        // Regular Parcel rates ex Lynn Valley (V7J 3H2), 0.16kg/32x13x3cm, +10%,
-        // a 5% storewide discount applied 2026-09-07, and a further $2
-        // reduction applied 2026-09-09.
+        // Flat-rate shipping zones. Originally approximated from Canada
+        // Post's published Regular Parcel rates ex Lynn Valley (V7J 3H2),
+        // 0.16kg/32x13x3cm, +10%, a 5% storewide discount applied
+        // 2026-09-07, and a $2 reduction applied 2026-09-09. Rebased
+        // 2026-09-13 to bring Metro Vancouver down to ~$10, with BC/Canada
+        // scaled by the same ratio they held to Metro Vancouver before.
         // Mirrored (and re-verified) server-side in create-checkout-session —
         // this copy is just for showing the customer a live estimate.
         const CA_POSTAL_RE = /^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$/;
@@ -230,12 +232,12 @@
         function getShippingZoneCents(postalCode) {
             const fsa = String(postalCode || '').trim().toUpperCase().replace(/\s/g, '').slice(0, 3);
             if (fsa.slice(0, 2) === 'V5' || fsa.slice(0, 2) === 'V6' || fsa.slice(0, 2) === 'V7') {
-                return { cents: 1537, label: 'Metro Vancouver' };
+                return { cents: 1000, label: 'Metro Vancouver' };
             }
             if (fsa.startsWith('V')) {
-                return { cents: 2139, label: 'Rest of BC' };
+                return { cents: 1392, label: 'Rest of BC' };
             }
-            return { cents: 2777, label: 'Rest of Canada' };
+            return { cents: 1807, label: 'Rest of Canada' };
         }
 
         function getShippingAddress() {
