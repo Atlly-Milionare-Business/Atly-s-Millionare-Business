@@ -142,6 +142,17 @@
         .diagonal-close:hover::after {
             transform: translateX(0) skewX(-18deg);
         }
+
+        /* Subtle 3D tilt + float on hover, matching the product image
+           hover effect on products.html. */
+        .tilt-wrap {
+            transform: perspective(900px) rotateX(0deg) rotateY(0deg) translateY(0) scale(1);
+            transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: transform;
+        }
+        .tilt-wrap.tilting {
+            box-shadow: 0 24px 40px -20px rgba(0, 0, 0, 0.35);
+        }
     </style>
 </head>
 
@@ -227,7 +238,7 @@
 
                 <!-- Model Image Column -->
                 <div class="flex items-center justify-end">
-                    <div class="w-full max-w-md bg-brand-white/95 p-6 rounded shadow-lg slide-in" style="transition-delay: 0.6s;">
+                    <div class="tilt-wrap w-full max-w-md bg-brand-white/95 p-6 rounded shadow-lg slide-in" style="transition-delay: 0.6s;">
                         <img src="./assets/bag-black.jpg"
                             alt="Altus Gear cross-body bag" class="w-full h-auto object-contain">
                     </div>
@@ -428,6 +439,27 @@
                             behavior: 'smooth'
                         });
                     }
+                });
+            });
+        });
+
+        // --- Subtle 3D tilt on product image hover, following the cursor
+        //     (same effect used on the product tiles on products.html) ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const MAX_TILT_DEG = 6;
+            document.querySelectorAll('.tilt-wrap').forEach((el) => {
+                el.addEventListener('mousemove', (e) => {
+                    const rect = el.getBoundingClientRect();
+                    const x = (e.clientX - rect.left) / rect.width;
+                    const y = (e.clientY - rect.top) / rect.height;
+                    const rotateY = (x - 0.5) * MAX_TILT_DEG;
+                    const rotateX = (0.5 - y) * MAX_TILT_DEG;
+                    el.style.transform = `perspective(900px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px) scale(1.03)`;
+                });
+                el.addEventListener('mouseenter', () => el.classList.add('tilting'));
+                el.addEventListener('mouseleave', () => {
+                    el.classList.remove('tilting');
+                    el.style.transform = '';
                 });
             });
         });
