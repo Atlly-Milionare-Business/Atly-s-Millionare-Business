@@ -137,7 +137,7 @@
                 <div id="thumb-rail" class="hidden flex-col gap-3 w-20 flex-shrink-0"></div>
 
                 <!-- Main image with arrows -->
-                <div class="relative bg-brand-grey flex-1 aspect-square overflow-hidden">
+                <div class="relative bg-brand-white flex-1 aspect-square overflow-hidden">
                     <img id="main-image" src="" alt="" class="absolute inset-0 w-full h-full object-contain">
                     <button id="prev-arrow" aria-label="Previous image" class="hidden absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white shadow items-center justify-center hover:bg-brand-grey transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
@@ -295,7 +295,7 @@
             rail.innerHTML = '';
             product.images.forEach((src, i) => {
                 const btn = document.createElement('button');
-                btn.className = 'thumb w-20 h-20 bg-brand-grey border-2 border-transparent overflow-hidden' + (i === state.imgIndex ? ' active' : '');
+                btn.className = 'thumb w-20 h-20 bg-brand-white border-2 border-transparent overflow-hidden' + (i === state.imgIndex ? ' active' : '');
                 btn.innerHTML = `<img src="${src}" class="w-full h-full object-contain" alt="${product.name} view ${i + 1}">`;
                 btn.addEventListener('click', () => { state.imgIndex = i; render(); });
                 rail.appendChild(btn);
