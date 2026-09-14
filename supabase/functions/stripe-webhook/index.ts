@@ -10,16 +10,15 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!);
 const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET")!;
 
-// Resend (https://resend.com) sends the order emails below.
-// IMPORTANT: onboarding@resend.dev is Resend's shared sandbox sender —
-// in sandbox mode Resend only actually delivers mail addressed to the
-// Resend account's own verified email. sendOrderNotification (to you)
-// works today because of that. sendCustomerConfirmation (to whatever
-// email the customer typed at checkout) will silently fail to deliver
-// until a real sending domain is verified in the Resend dashboard and
-// "from" below is changed to an address on that domain.
+// Resend (https://resend.com) sends the order notification email below.
+// IMPORTANT: onboarding@resend.dev is Resend's shared sandbox sender — in
+// sandbox mode Resend only actually delivers mail addressed to the Resend
+// account's own signup email, which is atlyliu2009@gmail.com, not
+// altusgear2026@gmail.com. There's no customer-facing order email by
+// design — the store owner emails customers manually using the address
+// Stripe collects at checkout.
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-const ADMIN_NOTIFICATION_EMAIL = "altusgear2026@gmail.com";
+const ADMIN_NOTIFICATION_EMAIL = "atlyliu2009@gmail.com";
 
 // SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are auto-injected by Supabase
 // into every Edge Function — no need to set these as secrets ourselves.
@@ -49,27 +48,6 @@ async function sendOrderNotification(items: Array<{ name: string | null; qty: nu
         console.error("Failed to send order notification email:", err);
         }
         }
-
-async function sendCustomerConfirmation(customerEmail: string | null, items: Array<{ name: string | null; qty: number | null }>, shippingName: string | null, shippingAddress: Stripe.Address | null, totalCents: number, currency: string) {
-  if (!RESEND_API_KEY || !customerEmail) return;
-  const total = "$" + (totalCents / 100).toFixed(2) + " " + currency.toUpperCase();
-  let body = "Hi" + (shippingName ? " " + shippingName : "") + ",\n\n";
-  body += "Thanks for your order from Altus Gear! Here's what you ordered:\n\n";
-  for (const item of items) {
-    body += "- " + (item.qty || 1) + "x " + (item.name || "Item") + "\n";
-  }
-  body += "\nTotal: " + total + "\n\n";
-  body += "Shipping to:\n" + (shippingName || "") + "\n" + (shippingAddress?.line1 || "") + "\n" + (shippingAddress?.line2 ? shippingAddress.line2 + "\n" : "") + (shippingAddress?.city || "") + ", " + (shippingAddress?.state || "") + " " + (shippingAddress?.postal_code || "") + "\n" + formatCountry(shippingAddress?.country) + "\n";
-  body += "\nWe'll email you a tracking number once your order ships.\n\n— Altus Gear";
-  try {
-    const res = await fetch("https://api.resend.com/emails", { method: "POST", headers: { "Authorization": "Bearer " + RESEND_API_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ from: "Altus Gear <onboarding@resend.dev>", to: customerEmail, subject: "Your Altus Gear order is confirmed", text: body }) });
-    if (!res.ok) {
-      console.error("Failed to send customer confirmation email:", await res.text());
-    }
-  } catch (err) {
-    console.error("Failed to send customer confirmation email:", err);
-  }
-}
 
         Deno.serve(async (req: Request) => {
            const signature = req.headers.get("Stripe-Signature");
@@ -173,7 +151,6 @@ async function sendCustomerConfirmation(customerEmail: string | null, items: Arr
 
     const itemsForEmail = lineItems.data.map((li) => ({ name: li.description, qty: li.quantity }));
     await sendOrderNotification(itemsForEmail, shipping?.name ?? null, shipping?.address ?? null, session.customer_details?.email ?? null, session.amount_total ?? 0, session.currency ?? "cad");
-    await sendCustomerConfirmation(session.customer_details?.email ?? null, itemsForEmail, shipping?.name ?? null, shipping?.address ?? null, session.amount_total ?? 0, session.currency ?? "cad");
   }
 
   return new Response(JSON.stringify({ received: true }), {
