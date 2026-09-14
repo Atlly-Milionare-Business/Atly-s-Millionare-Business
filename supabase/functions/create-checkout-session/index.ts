@@ -105,7 +105,10 @@ Deno.serve(async (req: Request) => {
       const product = PRODUCTS[String(item.id)];
       if (!product) continue;
       const qty = Math.max(1, Math.min(20, Math.floor(Number(item.qty) || 1)));
-      const variant = [item.color, item.size].filter(Boolean).join(" / ");
+      // Colour is already in every product's name (e.g. "Cross-Body Bag —
+      // Grey"), so only append size here to avoid "Grey (Grey)" on receipts
+      // and order emails.
+      const variant = [item.size].filter(Boolean).join(" / ");
       const i = lineCount++;
       subtotalCents += product.price * qty;
       orderItemsForMetadata.push({ id: String(item.id), qty });

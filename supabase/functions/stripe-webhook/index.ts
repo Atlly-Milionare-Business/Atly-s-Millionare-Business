@@ -28,6 +28,11 @@ const supabase = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 );
 
+function formatCountry(code: string | null | undefined): string {
+  if (!code) return "";
+  return code.toUpperCase() === "CA" ? "Canada" : code;
+}
+
 async function sendOrderNotification(items: Array<{ name: string | null; qty: number | null }>, shippingName: string | null, shippingAddress: Stripe.Address | null, customerEmail: string | null, totalCents: number, currency: string) {
   if (!RESEND_API_KEY) return;
   const total = "$" + (totalCents / 100).toFixed(2) + " " + currency.toUpperCase();
@@ -37,7 +42,7 @@ async function sendOrderNotification(items: Array<{ name: string | null; qty: nu
     body += "- " + (item.qty || 1) + "x " + (item.name || "Item") + "\n";
     }
     body += "\nTotal: " + total + "\n\n";
-    body += "Shipping to:\n" + (shippingName || "") + "\n" + (shippingAddress?.line1 || "") + "\n" + (shippingAddress?.line2 ? shippingAddress.line2 + "\n" : "") + (shippingAddress?.city || "") + ", " + (shippingAddress?.state || "") + " " + (shippingAddress?.postal_code || "") + "\n" + (shippingAddress?.country || "") + "\n";
+    body += "Shipping to:\n" + (shippingName || "") + "\n" + (shippingAddress?.line1 || "") + "\n" + (shippingAddress?.line2 ? shippingAddress.line2 + "\n" : "") + (shippingAddress?.city || "") + ", " + (shippingAddress?.state || "") + " " + (shippingAddress?.postal_code || "") + "\n" + formatCountry(shippingAddress?.country) + "\n";
     try {
       await fetch("https://api.resend.com/emails", { method: "POST", headers: { "Authorization": "Bearer " + RESEND_API_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ from: "Altus Gear Orders <onboarding@resend.dev>", to: ADMIN_NOTIFICATION_EMAIL, subject: "New Altus Gear order", text: body }) });
       } catch (err) {
@@ -54,7 +59,7 @@ async function sendCustomerConfirmation(customerEmail: string | null, items: Arr
     body += "- " + (item.qty || 1) + "x " + (item.name || "Item") + "\n";
   }
   body += "\nTotal: " + total + "\n\n";
-  body += "Shipping to:\n" + (shippingName || "") + "\n" + (shippingAddress?.line1 || "") + "\n" + (shippingAddress?.line2 ? shippingAddress.line2 + "\n" : "") + (shippingAddress?.city || "") + ", " + (shippingAddress?.state || "") + " " + (shippingAddress?.postal_code || "") + "\n" + (shippingAddress?.country || "") + "\n";
+  body += "Shipping to:\n" + (shippingName || "") + "\n" + (shippingAddress?.line1 || "") + "\n" + (shippingAddress?.line2 ? shippingAddress.line2 + "\n" : "") + (shippingAddress?.city || "") + ", " + (shippingAddress?.state || "") + " " + (shippingAddress?.postal_code || "") + "\n" + formatCountry(shippingAddress?.country) + "\n";
   body += "\nWe'll email you a tracking number once your order ships.\n\n— Altus Gear";
   try {
     const res = await fetch("https://api.resend.com/emails", { method: "POST", headers: { "Authorization": "Bearer " + RESEND_API_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ from: "Altus Gear <onboarding@resend.dev>", to: customerEmail, subject: "Your Altus Gear order is confirmed", text: body }) });
@@ -102,6 +107,22 @@ async function sendCustomerConfirmation(customerEmail: string | null, items: Arr
           },
         }
       : null;
+
+    // Idempotency guard: Stripe retries this webhook on any non-2xx
+    // response or timeout, which would otherwise insert a duplicate order,
+    // decrement stock a second time, and send duplicate emails for the
+    // same purchase. If we've already recorded this session, stop here.
+    const { data: existingOrder } = await supabase
+      .from("orders")
+      .select("id")
+      .eq("stripe_session_id", session.id)
+      .maybeSingle();
+
+    if (existingOrder) {
+      return new Response(JSON.stringify({ received: true, duplicate: true }), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }
 
     const { error } = await supabase.from("orders").insert({
       stripe_session_id: session.id,
