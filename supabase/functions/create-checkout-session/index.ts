@@ -15,7 +15,7 @@ const supabase = createClient(
 // Canonical product catalog — prices are looked up server-side only.
 // The browser sends product id + quantity + chosen variant; it never
 // gets to say what the price is, so checkout amounts can't be tampered with.
-const SITE_ORIGIN = "https://atlly-milionare-business.github.io/Atly-s-Millionare-Business";
+const SITE_ORIGIN = "https://altusgear.ca";
 
 const PRODUCTS: Record<string, { name: string; price: number; image: string }> = {
   "1": { name: "Cross-Body Bag — Black", price: 2500, image: `${SITE_ORIGIN}/assets/bag-black.jpg` },
