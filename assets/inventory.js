@@ -43,9 +43,15 @@
 
     async function setStock(id, qty) {
         qty = Math.max(0, parseInt(qty, 10) || 0);
+
+        // Writing stock now requires a signed-in Supabase Auth session (see
+        // lockdown-stock-update-rls.sql) — the anon key alone can only read.
+        var token = window.AltusAuth ? await window.AltusAuth.getAccessToken() : null;
+        if (!token) throw new Error('Not signed in.');
+
         var res = await fetch(REST_URL + '?product_id=eq.' + encodeURIComponent(id), {
             method: 'PATCH',
-            headers: Object.assign({ 'Prefer': 'return=minimal' }, HEADERS),
+            headers: Object.assign({ 'Prefer': 'return=minimal' }, HEADERS, { 'Authorization': 'Bearer ' + token }),
             body: JSON.stringify({ quantity: qty, updated_at: new Date().toISOString() })
         });
         if (!res.ok) throw new Error('stock save failed: ' + res.status);

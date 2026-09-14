@@ -1,6 +1,16 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const STRIPE_SECRET_KEY = Deno.env.get("STRIPE_SECRET_KEY");
+
+// Used only to read current stock levels before creating a Stripe session,
+// so two near-simultaneous checkouts can't both succeed for the last unit
+// of something. Service role bypasses RLS, which is fine for a read-only
+// stock lookup here.
+const supabase = createClient(
+  Deno.env.get("SUPABASE_URL")!,
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+);
 
 // Canonical product catalog — prices are looked up server-side only.
 // The browser sends product id + quantity + chosen variant; it never
@@ -72,6 +82,41 @@ Deno.serve(async (req: Request) => {
     }
     if (!ALLOWED_SHIPPING_COUNTRIES.includes(String(destination?.country || "").toUpperCase())) {
       return json({ error: "unsupported_country", message: "We currently only ship within Canada." }, 400);
+    }
+
+    // Check live stock before creating a Stripe session, so two
+    // near-simultaneous checkouts can't both succeed for the last unit of
+    // something. Stock itself is only decremented after payment (in
+    // stripe-webhook) — this is just a pre-check, not a reservation.
+    const requestedQty = new Map<string, number>();
+    for (const item of items as Array<{ id: string; qty: number }>) {
+      const id = String(item.id);
+      if (!PRODUCTS[id]) continue;
+      const qty = Math.max(1, Math.min(20, Math.floor(Number(item.qty) || 1)));
+      requestedQty.set(id, (requestedQty.get(id) || 0) + qty);
+    }
+
+    const { data: stockRows, error: stockError } = await supabase
+      .from("stock")
+      .select("product_id, quantity")
+      .in("product_id", Array.from(requestedQty.keys()).map(Number));
+
+    if (stockError) {
+      return json({ error: "server_error", message: "Could not verify stock." }, 500);
+    }
+
+    const stockById = new Map((stockRows ?? []).map((r) => [String(r.product_id), r.quantity]));
+    for (const [id, qty] of requestedQty) {
+      const available = stockById.get(id) ?? 0;
+      if (qty > available) {
+        const name = PRODUCTS[id]?.name || `product ${id}`;
+        return json({
+          error: "insufficient_stock",
+          message: available > 0
+            ? `Only ${available} left of ${name} — please update your cart.`
+            : `${name} just sold out — please update your cart.`,
+        }, 409);
+      }
     }
 
     const params = new URLSearchParams();

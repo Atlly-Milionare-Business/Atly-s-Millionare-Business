@@ -1,42 +1,48 @@
 (function () {
-    var SESSION_KEY = 'altus_admin_session';
-    var VALID_USERNAME = 'atlyliu2009@gmail.com';
-    var VALID_PASSWORD = 'yelchington';
+    // Same Supabase project used elsewhere on the site. Real Supabase Auth —
+    // replaces the old hardcoded-password check, which shipped a real
+    // password in plaintext to every visitor's browser.
+    var SUPABASE_URL = 'https://jdwrivizhjtlbizyjmpl.supabase.co';
+    var SUPABASE_ANON_KEY = 'sb_publishable_J6ZVTn3A08l2H0jHUT4p2A_quON5Dv9';
 
-    function isAuthed() {
-        try {
-            return sessionStorage.getItem(SESSION_KEY) === '1';
-        } catch (e) {
-            return false;
-        }
+    var client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function getSession() {
+        var res = await client.auth.getSession();
+        return res.data.session || null;
     }
 
-    function login(username, password) {
-        if (username === VALID_USERNAME && password === VALID_PASSWORD) {
-            try {
-                sessionStorage.setItem(SESSION_KEY, '1');
-            } catch (e) {}
-            return true;
-        }
-        return false;
+    async function isAuthed() {
+        return !!(await getSession());
     }
 
-    function logout() {
-        try {
-            sessionStorage.removeItem(SESSION_KEY);
-        } catch (e) {}
+    async function getAccessToken() {
+        var session = await getSession();
+        return session ? session.access_token : null;
     }
 
-    // Point every profile-icon link at the admin page if already signed in
-    // this session, otherwise at the login page.
-    function wireProfileLinks() {
+    async function login(email, password) {
+        var res = await client.auth.signInWithPassword({ email: email, password: password });
+        return !res.error;
+    }
+
+    async function logout() {
+        await client.auth.signOut();
+    }
+
+    // Point every profile-icon link at the admin page if already signed in,
+    // otherwise at the login page.
+    async function wireProfileLinks() {
+        var authed = await isAuthed();
         document.querySelectorAll('[data-profile-link]').forEach(function (el) {
-            el.setAttribute('href', isAuthed() ? 'admin.html' : 'login.html');
+            el.setAttribute('href', authed ? 'admin.html' : 'login.html');
         });
     }
 
     window.AltusAuth = {
+        client: client,
         isAuthed: isAuthed,
+        getAccessToken: getAccessToken,
         login: login,
         logout: logout,
         wireProfileLinks: wireProfileLinks

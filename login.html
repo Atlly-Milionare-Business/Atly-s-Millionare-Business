@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -69,18 +70,26 @@
 
     <script src="./assets/auth.js"></script>
     <script>
-        // Already signed in this session — skip straight to the admin page.
-        if (window.AltusAuth.isAuthed()) {
-            window.location.replace('admin.html');
-        }
+        (async function () {
+            // Already signed in — skip straight to the admin page.
+            if (await window.AltusAuth.isAuthed()) {
+                window.location.replace('admin.html');
+            }
+        })();
 
-        document.getElementById('login-form').addEventListener('submit', function (e) {
+        document.getElementById('login-form').addEventListener('submit', async function (e) {
             e.preventDefault();
+            const submitBtn = e.target.querySelector('button[type="submit"]');
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
             const errorEl = document.getElementById('login-error');
+            errorEl.classList.add('hidden');
 
-            if (window.AltusAuth.login(username, password)) {
+            submitBtn.disabled = true;
+            const ok = await window.AltusAuth.login(username, password);
+            submitBtn.disabled = false;
+
+            if (ok) {
                 window.location.href = 'admin.html';
             } else {
                 errorEl.classList.remove('hidden');

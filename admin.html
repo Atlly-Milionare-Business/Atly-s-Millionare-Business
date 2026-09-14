@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -30,14 +31,12 @@
         }
     </script>
     <script src="./assets/auth.js"></script>
-    <script>
-        // Gate this page before it paints anything.
-        if (!window.AltusAuth.isAuthed()) {
-            window.location.replace('login.html');
-        }
-    </script>
 </head>
 <body class="font-sans font-light bg-brand-white text-brand-black">
+
+    <!-- Hidden until the auth check below confirms a session, to avoid a
+         flash of admin content for signed-out visitors. -->
+    <div id="admin-gate" style="display:none;">
 
     <!-- Top Nav -->
     <nav class="border-b border-black/10">
@@ -68,6 +67,8 @@
             <span id="saved-msg" class="hidden ml-4 text-sm text-green-700">Saved ✓</span>
         </form>
     </main>
+
+    </div><!-- #admin-gate -->
 
     <script src="./assets/inventory.js"></script>
     <script>
@@ -118,7 +119,14 @@
                 rows.appendChild(row);
             });
         }
-        loadRows();
+        (async function init() {
+            if (!(await window.AltusAuth.isAuthed())) {
+                window.location.replace('login.html');
+                return;
+            }
+            document.getElementById('admin-gate').style.display = '';
+            loadRows();
+        })();
 
         stockForm.addEventListener('submit', async function (e) {
             e.preventDefault();
@@ -140,8 +148,8 @@
             saveBtn.textContent = 'Save Stock';
         });
 
-        document.getElementById('logout-btn').addEventListener('click', function () {
-            window.AltusAuth.logout();
+        document.getElementById('logout-btn').addEventListener('click', async function () {
+            await window.AltusAuth.logout();
             window.location.href = 'login.html';
         });
     </script>
